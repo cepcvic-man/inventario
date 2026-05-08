@@ -344,6 +344,13 @@
     .btn:disabled  { opacity: .45; pointer-events: none; }
 
     /* FAB */
+    .field-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px; }
+    .text-input   { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2); color: var(--text); font-size: 14px; box-sizing: border-box; }
+    .text-input:focus { outline: none; border-color: var(--primary); }
+    .icon-btn       { background: none; border: none; cursor: pointer; padding: 4px 6px; border-radius: 6px; font-size: 16px; line-height: 1; transition: background .15s; }
+    .icon-btn:hover { background: var(--surface-2); }
+    .icon-btn-danger:hover { background: rgba(239,68,68,.12); }
+
     /* ── Toggle switch ─────────────────────── */
     .toggle-track {
       width: 42px; height: 24px;
@@ -775,7 +782,10 @@
   <div id="page-inventory" class="page">
     <div class="page-header">
       <div class="t-title">Inventario</div>
-      <div class="t-small t-muted" id="inv-count-label">–</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="t-small t-muted" id="inv-count-label">–</div>
+        <button id="btn-new-item" class="btn btn-sm btn-primary hidden" onclick="openEditItemModal(null)">+ Articolo</button>
+      </div>
     </div>
     <div class="search-bar">
       <div class="search-input-wrap">
@@ -849,6 +859,15 @@
       </svg>
       <span>Admin</span>
     </button>
+    <button class="nav-tab" id="btn-logout" title="Esci">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/>
+        <line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+      <span>Esci</span>
+    </button>
   </nav>
 
 </div><!-- /app-shell -->
@@ -912,6 +931,39 @@
     <div style="display:flex;gap:10px;margin-top:16px">
       <button id="btn-check-fn-cancel" class="btn btn-ghost" style="flex:1">Annulla</button>
       <button id="btn-check-fn-confirm" class="btn btn-primary" style="flex:1">Conferma e invia</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modale edit articolo (admin) -->
+<div id="modal-edit-item" class="modal-backdrop hidden">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-edit-item-title">Modifica articolo</div>
+    <input type="hidden" id="edit-item-id">
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div>
+        <div class="field-label">Descrizione</div>
+        <input id="edit-item-desc" class="text-input" type="text" placeholder="Nome articolo">
+      </div>
+      <div style="display:flex;gap:10px">
+        <div style="flex:1">
+          <div class="field-label">Gruppo</div>
+          <input id="edit-item-group" class="text-input" type="text" placeholder="es. Vicenza">
+        </div>
+        <div style="width:100px">
+          <div class="field-label">Quantità</div>
+          <input id="edit-item-qty" class="text-input" type="number" min="0" placeholder="0">
+        </div>
+      </div>
+      <div>
+        <div class="field-label">Note</div>
+        <textarea id="edit-item-notes" class="text-input" rows="2" placeholder="Note opzionali" style="resize:vertical"></textarea>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:18px">
+      <button id="btn-edit-item-cancel" class="btn btn-ghost" style="flex:1">Annulla</button>
+      <button id="btn-edit-item-save" class="btn btn-primary" style="flex:1">Salva</button>
     </div>
   </div>
 </div>
@@ -1065,7 +1117,6 @@ async function dbCreateChecklist(title) {
     checklist_id: data.id,
     item_id:      item.id,
     out_qty: 0, return_qty: 0,
-    has_issue: false, check_notes: ''
   }));
   const { error: re } = await sb.from('checklist_rows').insert(rows);
   if (re) throw re;
@@ -1079,11 +1130,9 @@ async function dbUpsertRows(clId, rows) {
     id:           r.id,
     checklist_id: clId,
     item_id:      r.item_id,
-    out_qty:      r.out_qty    || 0,
-    return_qty:   r.return_qty || 0,
-    has_issue:    r.has_issue  || false,
-    check_notes:  r.check_notes || '',
-    updated_at:   new Date().toISOString()
+    out_qty:    r.out_qty    || 0,
+    return_qty: r.return_qty || 0,
+    updated_at: new Date().toISOString()
   }));
   const { error } = await sb.from('checklist_rows').upsert(upserts);
   if (error) throw error;
@@ -1094,6 +1143,29 @@ async function dbUpsertRows(clId, rows) {
   if (ce) throw ce;
 
   await dbJournal(clId, 'change', 'Righe aggiornate', null);
+}
+
+async function dbCreateItem(item) {
+  const { data, error } = await sb.from('inventory_items').insert(item).select().single();
+  if (error) throw error;
+  S.inventoryItems.push(data);
+  S.inventoryItems.sort((a, b) => a.sort_order - b.sort_order || a.description.localeCompare(b.description));
+  return data;
+}
+
+async function dbUpdateItem(item) {
+  const { error } = await sb.from('inventory_items')
+    .update({ description: item.description, group: item.group, quantity: item.quantity, notes: item.notes, updated_at: new Date().toISOString() })
+    .eq('id', item.id);
+  if (error) throw error;
+  const idx = S.inventoryItems.findIndex(i => i.id === item.id);
+  if (idx >= 0) Object.assign(S.inventoryItems[idx], item);
+}
+
+async function dbDeleteItem(id) {
+  const { error } = await sb.from('inventory_items').delete().eq('id', id);
+  if (error) throw error;
+  S.inventoryItems = S.inventoryItems.filter(i => i.id !== id);
 }
 
 async function dbSetCheckRequired(itemId, val) {
@@ -1207,6 +1279,33 @@ function openClDetail(clId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-cl-detail').classList.add('active');
   renderClDetail();
+}
+
+// ── Inventory edit (admin) ──────────────────────────────────
+function openEditItemModal(itemId) {
+  const item = itemId ? S.inventoryItems.find(i => i.id === itemId) : null;
+  document.getElementById('modal-edit-item-title').textContent = item ? 'Modifica articolo' : 'Nuovo articolo';
+  document.getElementById('edit-item-id').value    = item?.id    || '';
+  document.getElementById('edit-item-desc').value  = item?.description || '';
+  document.getElementById('edit-item-group').value = item?.group || '';
+  document.getElementById('edit-item-qty').value   = item?.quantity ?? 0;
+  document.getElementById('edit-item-notes').value = item?.notes || '';
+  document.getElementById('modal-edit-item').classList.remove('hidden');
+  document.getElementById('edit-item-desc').focus();
+}
+
+async function confirmDeleteItem(itemId) {
+  const item = S.inventoryItems.find(i => i.id === itemId);
+  if (!item) return;
+  if (!confirm(`Eliminare "${item.description}"? L'azione è irreversibile.`)) return;
+  showLoading(true);
+  try {
+    await dbDeleteItem(itemId);
+    buildInvList(document.getElementById('inv-search')?.value || '');
+    document.getElementById('inv-count-label').textContent = `${S.inventoryItems.length} articoli`;
+    showToast('Articolo eliminato.', 'success');
+  } catch(e) { showToast(e.message, 'error'); }
+  finally { showLoading(false); }
 }
 
 function openCheckFnModal(rows) {
@@ -1444,7 +1543,7 @@ async function renderClDetail() {
     S.inventoryItems.forEach(item => {
       if (!rowMap[item.id]) rowMap[item.id] = {
         id: null, checklist_id: cl.id, item_id: item.id,
-        out_qty: 0, return_qty: 0, has_issue: false, check_notes: ''
+        out_qty: 0, return_qty: 0
       };
     });
     S.currentClRows = Object.values(rowMap);
@@ -1519,9 +1618,8 @@ function buildClRows(filter) {
       <span class="t-meta" style="margin-left:auto">${entries.length} articoli</span>
     </div>`;
     entries.forEach(({ row, item }) => {
-      const hasChanges = row.out_qty > 0 || row.return_qty > 0 || row.has_issue;
-      const hasIssue   = row.has_issue;
-      html += `<div class="cl-row ${hasIssue ? 'has-issue' : hasChanges ? 'has-changes' : ''}" data-item="${item.id}">
+      const hasChanges = row.out_qty > 0 || row.return_qty > 0;
+      html += `<div class="cl-row ${hasChanges ? 'has-changes' : ''}" data-item="${item.id}">
         <div class="cl-row-name">${esc(itemName(item.description))}</div>
         <div class="cl-row-meta">Max: ${item.quantity}${item.notes ? ' · ' + esc(item.notes.substring(0,60)) : ''}</div>
         <div class="cl-qty-cols">
@@ -1550,20 +1648,6 @@ function buildClRows(filter) {
             </div>
           </div>`}
         </div>
-        ${!readonly ? `<div style="margin-top:10px;display:flex;align-items:center;gap:10px">
-          <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--warning)">
-            <input type="checkbox" data-field="has_issue" data-item="${item.id}"
-                   ${row.has_issue ? 'checked' : ''}>
-            Problema
-          </label>
-          <input class="form-control" type="text" placeholder="Note…"
-                 style="flex:1;padding:8px 10px;font-size:13px"
-                 data-field="check_notes" data-item="${item.id}"
-                 value="${esc(row.check_notes || '')}">
-        </div>` : `${row.has_issue || row.check_notes ? `
-          <div style="margin-top:8px;font-size:12px;color:var(--warning)">
-            ${row.has_issue ? '⚠ Problema' : ''} ${row.check_notes ? '· ' + esc(row.check_notes) : ''}
-          </div>` : ''}`}
       </div>`;
     });
   });
@@ -1584,7 +1668,7 @@ function buildClRows(filter) {
       const input = area.querySelector(`input[data-field="${field}"][data-item="${itemId}"]`);
       if (input) input.value = val;
       const card = btn.closest('.cl-row');
-      if (card) card.classList.toggle('has-changes', val > 0 || row.has_issue);
+      if (card) card.classList.toggle('has-changes', val > 0);
     });
   });
 
@@ -1593,13 +1677,7 @@ function buildClRows(filter) {
       const { field, item: itemId } = input.dataset;
       const row = S.currentClRows.find(r => r.item_id === itemId);
       if (!row) return;
-      if (field === 'has_issue') {
-        row.has_issue = input.checked;
-        const card = input.closest('.cl-row');
-        if (card) card.classList.toggle('has-issue', input.checked);
-      } else if (field === 'check_notes') {
-        row.check_notes = input.value;
-      } else {
+      if (field === 'out_qty' || field === 'return_qty') {
         const inv = itemMap[itemId];
         const v = Math.max(0, Math.min(parseInt(input.value) || 0, inv?.quantity || 9999));
         row[field] = v;
@@ -1617,11 +1695,13 @@ async function renderInventory() {
   try {
     if (!S.inventoryItems.length) S.inventoryItems = await dbGetInventory();
     document.getElementById('inv-count-label').textContent = `${S.inventoryItems.length} articoli`;
+    document.getElementById('btn-new-item').classList.toggle('hidden', S.role !== 'admin');
     buildInvList('');
   } finally { showLoading(false); }
 }
 
 function buildInvList(filter) {
+  const isAdmin = S.role === 'admin';
   const f = filter.toLowerCase().trim();
   const items = S.inventoryItems.filter(i =>
     !f || i.description.toLowerCase().includes(f) || i.notes.toLowerCase().includes(f)
@@ -1649,7 +1729,13 @@ function buildInvList(filter) {
             <div class="inv-item-name">${esc(itemName(item.description))}</div>
             ${item.notes ? `<div class="inv-item-meta">${esc(item.notes.substring(0,80))}${item.notes.length>80?'…':''}</div>` : ''}
           </div>
-          <span class="badge badge-neutral" style="flex-shrink:0">${item.quantity}</span>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+            <span class="badge badge-neutral">${item.quantity}</span>
+            ${isAdmin ? `
+            <button class="icon-btn" title="Modifica" onclick="openEditItemModal('${esc(item.id)}')">✏️</button>
+            <button class="icon-btn icon-btn-danger" title="Elimina" onclick="confirmDeleteItem('${esc(item.id)}')">🗑️</button>
+            ` : ''}
+          </div>
         </div>
       </div>`;
     });
@@ -1778,7 +1864,7 @@ async function exportXlsx() {
       [`Checklist: ${cl.title}`],
       [`Creata: ${fmtDateTime(cl.created_at)}`],
       [],
-      ['Sezione','Articolo','Qta Tot.','Uscita','Rientro','Differenza','Problema','Note'],
+      ['Sezione','Articolo','Qta Tot.','Uscita','Rientro','Differenza'],
     ];
 
     rows.forEach(r => {
@@ -1790,26 +1876,12 @@ async function exportXlsx() {
         item.quantity,
         r.out_qty || 0,
         r.return_qty || 0,
-        (r.out_qty || 0) - (r.return_qty || 0),
-        r.has_issue ? 'SI' : '',
-        r.check_notes || ''
+        (r.out_qty || 0) - (r.return_qty || 0)
       ]);
     });
 
     const ws = XLSX.utils.aoa_to_sheet(data);
-    ws['!cols'] = [{wch:18},{wch:40},{wch:8},{wch:8},{wch:8},{wch:10},{wch:10},{wch:30}];
-
-    const headerRow = 5;
-    data.slice(5).forEach((row, i) => {
-      if (row[6] === 'SI') {
-        const excelRow = headerRow + i + 1;
-        for (let c = 0; c < 8; c++) {
-          const addr = XLSX.utils.encode_cell({ r: excelRow - 1, c });
-          if (!ws[addr]) ws[addr] = { v: '', t: 's' };
-          ws[addr].s = { fill: { fgColor: { rgb: 'FCE4D6' } } };
-        }
-      }
-    });
+    ws['!cols'] = [{wch:18},{wch:40},{wch:8},{wch:8},{wch:8},{wch:12}];
 
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Checklist');
@@ -1876,6 +1948,41 @@ function wireEvents() {
   document.getElementById('btn-modal-new-cancel').addEventListener('click', () =>
     document.getElementById('modal-new-cl').classList.add('hidden')
   );
+
+  document.getElementById('btn-logout').addEventListener('click', async () => {
+    if (!confirm('Esci dall\'account?')) return;
+    await sb.auth.signOut();
+    location.reload();
+  });
+
+  document.getElementById('btn-edit-item-cancel').addEventListener('click', () =>
+    document.getElementById('modal-edit-item').classList.add('hidden')
+  );
+
+  document.getElementById('btn-edit-item-save').addEventListener('click', async () => {
+    const desc  = document.getElementById('edit-item-desc').value.trim();
+    const group = document.getElementById('edit-item-group').value.trim();
+    const qty   = parseInt(document.getElementById('edit-item-qty').value) || 0;
+    const notes = document.getElementById('edit-item-notes').value.trim();
+    const id    = document.getElementById('edit-item-id').value;
+    if (!desc) { showToast('Inserisci una descrizione.', 'error'); return; }
+    document.getElementById('modal-edit-item').classList.add('hidden');
+    showLoading(true);
+    try {
+      if (id) {
+        await dbUpdateItem({ id, description: desc, group: group || 'Vicenza', quantity: qty, notes });
+        showToast('Articolo aggiornato.', 'success');
+      } else {
+        const maxSort = S.inventoryItems.reduce((m, i) => Math.max(m, i.sort_order || 0), 0);
+        await dbCreateItem({ id: crypto.randomUUID(), description: desc, group: group || 'Vicenza', quantity: qty, notes, sort_order: maxSort + 10 });
+        showToast('Articolo aggiunto.', 'success');
+      }
+      const searchVal = document.getElementById('inv-search')?.value || '';
+      buildInvList(searchVal);
+      document.getElementById('inv-count-label').textContent = `${S.inventoryItems.length} articoli`;
+    } catch(e) { showToast(e.message, 'error'); }
+    finally { showLoading(false); }
+  });
 
   document.getElementById('btn-modal-new-confirm').addEventListener('click', async () => {
     const title = document.getElementById('new-cl-title').value.trim();
