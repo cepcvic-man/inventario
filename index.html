@@ -1,0 +1,1920 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <title>CEPC Inventario</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+  <style>
+    /* ═══════════════════════════════════════════
+       DESIGN SYSTEM
+    ═══════════════════════════════════════════ */
+    :root {
+      --bg:          #F0F4FF;
+      --bg-alt:      #E8EDFC;
+      --surface:     #FFFFFF;
+      --surface-alt: #F7F9FF;
+
+      --primary:     #6366F1;
+      --primary-d:   #4F46E5;
+      --primary-soft:#EEF2FF;
+      --primary-muted: rgba(99,102,241,.12);
+
+      --accent:      #8B5CF6;
+      --accent-soft: #F5F3FF;
+
+      --success:     #10B981;
+      --success-soft:#ECFDF5;
+      --warning:     #F59E0B;
+      --warning-soft:#FFFBEB;
+      --danger:      #EF4444;
+      --danger-soft: #FEF2F2;
+
+      --text:        #1E293B;
+      --text-2:      #475569;
+      --text-3:      #94A3B8;
+      --border:      #E2E8F0;
+
+      --shadow-sm:   0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+      --shadow:      0 4px 16px rgba(99,102,241,.08), 0 2px 6px rgba(0,0,0,.05);
+      --shadow-md:   0 8px 32px rgba(99,102,241,.12), 0 4px 12px rgba(0,0,0,.06);
+
+      --radius:      16px;
+      --radius-sm:   10px;
+      --radius-xs:   6px;
+
+      --nav-h:       68px;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --font:        'Inter', system-ui, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { -webkit-text-size-adjust: 100%; }
+
+    body {
+      font-family: var(--font);
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--text);
+      background: var(--bg);
+      min-height: 100dvh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; border: none; background: none; }
+    a { color: inherit; text-decoration: none; }
+
+    .hidden { display: none !important; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+
+    /* ═══════════════════════════════════════════
+       TYPOGRAPHY
+    ═══════════════════════════════════════════ */
+    .t-hero  { font-size: clamp(28px,7vw,34px); font-weight: 800; letter-spacing: -.5px; line-height: 1.15; }
+    .t-title { font-size: 22px; font-weight: 700; letter-spacing: -.3px; }
+    .t-h2    { font-size: 18px; font-weight: 600; }
+    .t-h3    { font-size: 16px; font-weight: 600; }
+    .t-body  { font-size: 15px; }
+    .t-small { font-size: 13px; }
+    .t-meta  { font-size: 12px; color: var(--text-3); }
+    .t-muted { color: var(--text-2); }
+
+    /* ═══════════════════════════════════════════
+       LAYOUT
+    ═══════════════════════════════════════════ */
+    #app-shell {
+      display: flex;
+      flex-direction: column;
+      min-height: 100dvh;
+    }
+
+    .page {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      padding-bottom: calc(var(--nav-h) + var(--safe-bottom) + 16px);
+      animation: fadeIn .18s ease;
+    }
+    .page.active { display: flex; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .page-header {
+      padding: 56px 20px 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .page-header-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .back-btn {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      color: var(--text);
+    }
+    .back-btn:active { background: var(--bg-alt); }
+
+    .scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .section {
+      padding: 20px 16px 4px;
+    }
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      margin-bottom: 10px;
+    }
+
+    /* ═══════════════════════════════════════════
+       CARDS
+    ═══════════════════════════════════════════ */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 16px;
+      border: 1px solid var(--border);
+    }
+    .card + .card { margin-top: 10px; }
+
+    .card-hero {
+      background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 24px 20px;
+      box-shadow: var(--shadow-md);
+      border: none;
+    }
+    .card-hero .t-muted { color: rgba(255,255,255,.72); }
+
+    .card-tap {
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .card-tap:active {
+      transform: scale(.98);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* ═══════════════════════════════════════════
+       BADGES
+    ═══════════════════════════════════════════ */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+    .badge-open    { background: var(--primary-soft);  color: var(--primary); }
+    .badge-closed  { background: #F1F5F9;               color: var(--text-2); }
+    .badge-submit  { background: var(--success-soft);   color: var(--success); }
+    .badge-issue   { background: var(--warning-soft);   color: var(--warning); }
+    .badge-danger  { background: var(--danger-soft);    color: var(--danger); }
+    .badge-neutral { background: var(--bg-alt);         color: var(--text-2); }
+
+    /* section color chips */
+    .chip {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 100px;
+    }
+
+    /* ═══════════════════════════════════════════
+       BOTTOM NAVIGATION
+    ═══════════════════════════════════════════ */
+    #bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0; right: 0;
+      height: calc(var(--nav-h) + var(--safe-bottom));
+      padding-bottom: var(--safe-bottom);
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      z-index: 100;
+      box-shadow: 0 -4px 20px rgba(0,0,0,.06);
+    }
+    .nav-tab {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      color: var(--text-3);
+      padding: 10px 4px;
+      transition: color .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-tab svg { width: 22px; height: 22px; }
+    .nav-tab span { font-size: 11px; font-weight: 500; }
+    .nav-tab.active { color: var(--primary); }
+    .nav-tab.active svg { stroke: var(--primary); }
+    .nav-tab-dot {
+      position: absolute;
+      top: 10px;
+      width: 6px; height: 6px;
+      background: var(--danger);
+      border-radius: 50%;
+      margin-left: 14px;
+    }
+
+    /* ═══════════════════════════════════════════
+       FORMS / INPUTS
+    ═══════════════════════════════════════════ */
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-2);
+      margin-bottom: 6px;
+    }
+    .form-control {
+      width: 100%;
+      padding: 13px 14px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 15px;
+      transition: border-color .15s, box-shadow .15s;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    .form-control:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-muted);
+    }
+    .form-control::placeholder { color: var(--text-3); }
+
+    select.form-control {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 40px;
+    }
+
+    /* Qty stepper */
+    .qty-row {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      height: 44px;
+    }
+    .qty-btn {
+      width: 44px; height: 44px;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--primary);
+      font-size: 20px;
+      font-weight: 500;
+      background: none;
+      border: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .qty-btn:active { background: var(--primary-soft); }
+    .qty-input {
+      flex: 1;
+      text-align: center;
+      border: none;
+      background: transparent;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      outline: none;
+      min-width: 0;
+      -webkit-appearance: none;
+    }
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+    /* ═══════════════════════════════════════════
+       BUTTONS
+    ═══════════════════════════════════════════ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 14px 24px;
+      border-radius: var(--radius-sm);
+      transition: opacity .12s, transform .12s;
+      white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:active { opacity: .82; transform: scale(.98); }
+    .btn-primary   { background: var(--primary);   color: #fff; box-shadow: 0 4px 14px rgba(99,102,241,.35); }
+    .btn-secondary { background: var(--primary-soft); color: var(--primary); }
+    .btn-danger    { background: var(--danger-soft);  color: var(--danger); }
+    .btn-success   { background: var(--success-soft); color: var(--success); }
+    .btn-ghost     { background: transparent; color: var(--text-2); }
+    .btn-sm        { font-size: 13px; padding: 8px 14px; border-radius: var(--radius-xs); }
+    .btn-block     { width: 100%; }
+    .btn-icon      { padding: 10px; border-radius: var(--radius-sm); }
+    .btn:disabled  { opacity: .45; pointer-events: none; }
+
+    /* FAB */
+    .fab {
+      position: fixed;
+      bottom: calc(var(--nav-h) + var(--safe-bottom) + 16px);
+      right: 16px;
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 6px 20px rgba(99,102,241,.45);
+      z-index: 50;
+      transition: transform .15s;
+    }
+    .fab:active { transform: scale(.92); }
+    .fab svg { width: 24px; height: 24px; }
+
+    /* ═══════════════════════════════════════════
+       DIVIDER / LIST
+    ═══════════════════════════════════════════ */
+    .list-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .list-row:first-child { border-radius: var(--radius) var(--radius) 0 0; }
+    .list-row:last-child  { border-radius: 0 0 var(--radius) var(--radius); border-bottom: none; }
+    .list-row:only-child  { border-radius: var(--radius); border-bottom: none; }
+
+    /* ═══════════════════════════════════════════
+       TOAST / SNACKBAR
+    ═══════════════════════════════════════════ */
+    #toast {
+      position: fixed;
+      bottom: calc(var(--nav-h) + var(--safe-bottom) + 12px);
+      left: 16px; right: 16px;
+      background: var(--text);
+      color: #fff;
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 200;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity .2s, transform .2s;
+      pointer-events: none;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+    #toast.error { background: var(--danger); }
+    #toast.success { background: var(--success); }
+
+    /* ═══════════════════════════════════════════
+       LOADING OVERLAY
+    ═══════════════════════════════════════════ */
+    #loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(240,244,255,.85);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 300;
+      backdrop-filter: blur(4px);
+    }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ═══════════════════════════════════════════
+       MODAL / SHEET
+    ═══════════════════════════════════════════ */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,.5);
+      z-index: 150;
+      display: flex;
+      align-items: flex-end;
+      backdrop-filter: blur(2px);
+    }
+    .modal-sheet {
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      background: var(--surface);
+      border-radius: 24px 24px 0 0;
+      padding: 8px 20px calc(20px + var(--safe-bottom));
+      max-height: 90dvh;
+      overflow-y: auto;
+      animation: slideUp .22s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(40px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    .modal-handle {
+      width: 36px; height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      margin: 12px auto 20px;
+    }
+    .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+
+    /* ═══════════════════════════════════════════
+       STAT CARDS
+    ═══════════════════════════════════════════ */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+    .stat-value { font-size: 28px; font-weight: 800; color: var(--primary); line-height: 1; }
+    .stat-label { font-size: 12px; color: var(--text-2); margin-top: 4px; }
+
+    /* ═══════════════════════════════════════════
+       INVENTORY SECTION GROUPS
+    ═══════════════════════════════════════════ */
+    .inv-section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px 10px;
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 5;
+    }
+    .inv-section-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .inv-item-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      margin: 0 16px 8px;
+    }
+    .inv-item-name { font-size: 14px; font-weight: 600; color: var(--text); }
+    .inv-item-meta { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+
+    /* ═══════════════════════════════════════════
+       CHECKLIST DETAIL ROW
+    ═══════════════════════════════════════════ */
+    .cl-row {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      margin: 0 16px 8px;
+    }
+    .cl-row.has-issue { border-color: var(--warning); background: var(--warning-soft); }
+    .cl-row.has-changes { border-color: var(--primary); }
+    .cl-row-name { font-size: 14px; font-weight: 600; }
+    .cl-row-meta { font-size: 12px; color: var(--text-3); margin-bottom: 10px; margin-top: 2px; }
+    .cl-qty-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .cl-qty-label { font-size: 11px; font-weight: 600; color: var(--text-3); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .4px; }
+
+    /* Search bar */
+    .search-bar {
+      padding: 12px 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 9;
+    }
+    .search-input-wrap {
+      position: relative;
+    }
+    .search-input-wrap svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-3);
+      width: 16px; height: 16px;
+      pointer-events: none;
+    }
+    .search-input {
+      width: 100%;
+      padding: 10px 14px 10px 38px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+    }
+    .search-input:focus { border-color: var(--primary); }
+
+    /* ═══════════════════════════════════════════
+       EMPTY STATE
+    ═══════════════════════════════════════════ */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 32px;
+      text-align: center;
+      color: var(--text-2);
+      gap: 12px;
+    }
+    .empty-state svg { color: var(--text-3); width: 48px; height: 48px; }
+
+    /* ═══════════════════════════════════════════
+       LOGIN
+    ═══════════════════════════════════════════ */
+    #page-login {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px;
+      background: var(--bg);
+    }
+    .login-logo {
+      width: 72px; height: 72px;
+      background: linear-gradient(135deg, #6366F1, #8B5CF6);
+      border-radius: 22px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 24px rgba(99,102,241,.35);
+    }
+    .login-card {
+      width: 100%;
+      max-width: 380px;
+      background: var(--surface);
+      border-radius: 24px;
+      padding: 28px 24px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border);
+    }
+    .login-error {
+      background: var(--danger-soft);
+      color: var(--danger);
+      border-radius: var(--radius-xs);
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .login-error.visible { display: block; }
+
+    /* Progress bar */
+    .progress-bar-wrap { background: var(--bg); border-radius: 100px; height: 6px; overflow: hidden; }
+    .progress-bar      { height: 100%; background: var(--primary); border-radius: 100px; transition: width .3s ease; }
+
+    /* Availability table */
+    .avail-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto;
+      gap: 8px;
+      align-items: center;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .avail-row.header {
+      font-weight: 600;
+      font-size: 11px;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      background: var(--bg);
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    }
+    .avail-num { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .avail-num.out   { color: var(--primary); }
+    .avail-num.avail { color: var(--success); }
+    .avail-num.zero  { color: var(--danger); }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     LOGIN SCREEN
+═══════════════════════════════════════════ -->
+<div id="page-login">
+  <div class="login-logo">
+    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none"
+         stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2Z"/>
+      <path d="M16 3H8a2 2 0 0 0-2 2v2h12V5a2 2 0 0 0-2-2Z"/>
+      <path d="M12 12v4"/><path d="M10 14h4"/>
+    </svg>
+  </div>
+  <div class="login-card">
+    <div style="margin-bottom:24px">
+      <div class="t-title" style="margin-bottom:4px">CEPC Inventario</div>
+      <div class="t-small t-muted">Congresso di Vicenza 2026</div>
+    </div>
+    <div id="login-error" class="login-error"></div>
+    <div class="form-group">
+      <label class="form-label" for="inp-email">Email</label>
+      <input id="inp-email" type="email" class="form-control" placeholder="operatore@cepc.local" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="inp-pass">Password</label>
+      <input id="inp-pass" type="password" class="form-control" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button id="btn-login" class="btn btn-primary btn-block" style="margin-top:8px">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+        <polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/>
+      </svg>
+      Accedi
+    </button>
+  </div>
+  <div class="t-meta" style="margin-top:24px;text-align:center">CEPC · Vicenza · 2026</div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     APP SHELL (visible after login)
+═══════════════════════════════════════════ -->
+<div id="app-shell" class="hidden">
+
+  <!-- ── HOME ── -->
+  <div id="page-home" class="page active scroll-area">
+    <div style="padding:56px 16px 16px">
+      <div class="card-hero" style="margin-bottom:16px">
+        <div class="t-meta" style="color:rgba(255,255,255,.65);margin-bottom:6px">Congresso Vicenza 2026</div>
+        <div class="t-hero" style="color:#fff">Inventario<br>CEPC</div>
+        <div class="t-small" style="color:rgba(255,255,255,.7);margin-top:8px" id="home-subtitle">Caricamento…</div>
+      </div>
+      <div class="stats-grid" id="home-stats">
+        <div class="stat-card"><div class="stat-value" id="stat-open">–</div><div class="stat-label">Checklist aperte</div></div>
+        <div class="stat-card"><div class="stat-value" id="stat-items">–</div><div class="stat-label">Articoli inventario</div></div>
+        <div class="stat-card"><div class="stat-value" id="stat-issues">–</div><div class="stat-label">Problemi segnalati</div></div>
+        <div class="stat-card"><div class="stat-value" id="stat-closed">–</div><div class="stat-label">Checklist chiuse</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-label">Attività recenti</div>
+      <div id="home-recent"></div>
+    </div>
+  </div>
+
+  <!-- ── CHECKLISTS ── -->
+  <div id="page-checklists" class="page">
+    <div class="page-header">
+      <div class="t-title">Checklist</div>
+      <div class="t-small t-muted" id="cl-count-label">–</div>
+    </div>
+    <div class="scroll-area" id="cl-list-area">
+      <div style="height:12px"></div>
+      <div id="cl-list" style="padding:0 16px"></div>
+    </div>
+    <button class="fab hidden" id="fab-new-cl" title="Nuova checklist" aria-label="Nuova checklist">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- ── CHECKLIST DETAIL ── -->
+  <div id="page-cl-detail" class="page">
+    <div class="page-header">
+      <div class="page-header-row">
+        <button class="back-btn" id="cl-detail-back" aria-label="Indietro">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m15 18-6-6 6-6"/>
+          </svg>
+        </button>
+        <div style="flex:1;min-width:0">
+          <div class="t-h2" id="cl-detail-title" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">–</div>
+          <div id="cl-detail-badge" style="margin-top:4px"></div>
+        </div>
+        <button class="btn btn-sm btn-secondary hidden" id="btn-cl-export" style="flex-shrink:0">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          .xlsx
+        </button>
+      </div>
+    </div>
+    <!-- Operator info bar -->
+    <div id="cl-operator-bar" style="padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border)">
+      <div class="t-small t-muted" id="cl-operator-text">–</div>
+    </div>
+    <!-- Search -->
+    <div class="search-bar">
+      <div class="search-input-wrap">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input id="cl-search" class="search-input" type="search" placeholder="Cerca articolo…">
+      </div>
+    </div>
+    <div class="scroll-area" id="cl-rows-area" style="padding-bottom:120px"></div>
+    <!-- Bottom action bar -->
+    <div id="cl-action-bar" style="position:fixed;bottom:calc(var(--nav-h) + var(--safe-bottom));left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:12px 16px;display:flex;gap:10px;z-index:20">
+      <button id="btn-cl-save" class="btn btn-secondary" style="flex:1">Salva bozza</button>
+      <button id="btn-cl-submit" class="btn btn-primary" style="flex:1">Invia checklist</button>
+      <button id="btn-cl-close" class="btn btn-success hidden" style="flex:1">Chiudi</button>
+    </div>
+  </div>
+
+  <!-- ── INVENTARIO ── -->
+  <div id="page-inventory" class="page">
+    <div class="page-header">
+      <div class="t-title">Inventario</div>
+      <div class="t-small t-muted" id="inv-count-label">–</div>
+    </div>
+    <div class="search-bar">
+      <div class="search-input-wrap">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input id="inv-search" class="search-input" type="search" placeholder="Cerca articolo…">
+      </div>
+    </div>
+    <div class="scroll-area" id="inv-list-area">
+      <div id="inv-list"></div>
+    </div>
+  </div>
+
+  <!-- ── ADMIN ── -->
+  <div id="page-admin" class="page">
+    <div class="page-header">
+      <div class="t-title">Admin</div>
+      <div class="t-small t-muted">Pannello superutente</div>
+    </div>
+    <div class="scroll-area">
+      <!-- Availability -->
+      <div class="section">
+        <div class="section-label">Disponibilità articoli</div>
+        <div id="admin-avail" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden"></div>
+      </div>
+      <!-- Checklist admin actions -->
+      <div class="section">
+        <div class="section-label">Gestione checklist</div>
+        <div id="admin-cl-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BOTTOM NAV ── -->
+  <nav id="bottom-nav">
+    <button class="nav-tab active" data-tab="home">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <span>Home</span>
+    </button>
+    <button class="nav-tab" data-tab="checklists">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+      </svg>
+      <span>Checklist</span>
+    </button>
+    <button class="nav-tab" data-tab="inventory">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+        <path d="m3.27 6.96 8.73 5.05 8.73-5.05"/><line x1="12" y1="22.08" x2="12" y2="12"/>
+      </svg>
+      <span>Inventario</span>
+    </button>
+    <button class="nav-tab hidden" data-tab="admin" id="nav-admin-tab">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+      </svg>
+      <span>Admin</span>
+    </button>
+  </nav>
+
+</div><!-- /app-shell -->
+
+<!-- ═══════════════════════════════════════════
+     MODALS
+═══════════════════════════════════════════ -->
+
+<!-- New Checklist Modal -->
+<div id="modal-new-cl" class="modal-backdrop hidden">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Nuova Checklist</div>
+    <div class="form-group">
+      <label class="form-label" for="new-cl-title">Titolo</label>
+      <input id="new-cl-title" class="form-control" type="text" placeholder="Es. Uscita materiale 15/06">
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="new-cl-mode">Tipo</label>
+      <select id="new-cl-mode" class="form-control">
+        <option value="checkout">Uscita materiale</option>
+        <option value="return">Rientro materiale</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button id="btn-modal-new-cancel" class="btn btn-ghost" style="flex:1">Annulla</button>
+      <button id="btn-modal-new-confirm" class="btn btn-primary" style="flex:1">Crea</button>
+    </div>
+  </div>
+</div>
+
+<!-- Operator Info Modal -->
+<div id="modal-operator" class="modal-backdrop hidden">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Informazioni operatore</div>
+    <div class="form-group">
+      <label class="form-label" for="op-fullname">Nome e cognome</label>
+      <input id="op-fullname" class="form-control" type="text" placeholder="Mario Rossi">
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="op-congregation">Congregazione</label>
+      <input id="op-congregation" class="form-control" type="text" placeholder="Es. Vicenza Sud">
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="op-phone">Telefono</label>
+      <input id="op-phone" class="form-control" type="tel" placeholder="+39 000 000 0000">
+    </div>
+    <button id="btn-op-confirm" class="btn btn-primary btn-block" style="margin-top:8px">Conferma</button>
+  </div>
+</div>
+
+<!-- Global overlays -->
+<div id="loading-overlay" class="hidden"><div class="spinner"></div></div>
+<div id="toast"></div>
+
+<!-- ═══════════════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════════
+// CONFIG — modifica prima del deploy
+// ═══════════════════════════════════════════════════════════════
+const SUPABASE_URL  = 'https://numpwzhfmusaagjiqkoc.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_DEEZJz95_A0OJdcqOta29A_zmVBfCiJ';
+const ENCRYPT_PASS  = 'VicenzaCEPCInventarioFormia2026';
+// ═══════════════════════════════════════════════════════════════
+
+// ── Supabase client ──────────────────────────────────────────
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// ════════════════════════════════════════════════════════════
+// ENCRYPTION  (AES-256-GCM via Web Crypto API)
+// Protegge i dati personali dell'operatore nei dump DB.
+// La chiave è derivata da ENCRYPT_PASS con PBKDF2.
+// ════════════════════════════════════════════════════════════
+const ENC_SALT = new Uint8Array([
+  0xCE,0x50,0xC7,0x1A,0x82,0x3F,0x6B,0xD4,
+  0x91,0x5E,0x2C,0xA7,0x08,0xF3,0x44,0xBB
+]);
+let _encKey = null;
+
+async function initEncKey() {
+  const raw = await crypto.subtle.importKey(
+    'raw', new TextEncoder().encode(ENCRYPT_PASS),
+    'PBKDF2', false, ['deriveKey']
+  );
+  _encKey = await crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt: ENC_SALT, iterations: 100000, hash: 'SHA-256' },
+    raw,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt']
+  );
+}
+
+async function enc(obj) {
+  if (!_encKey) await initEncKey();
+  const iv  = crypto.getRandomValues(new Uint8Array(12));
+  const ct  = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv },
+    _encKey,
+    new TextEncoder().encode(JSON.stringify(obj))
+  );
+  const b64 = a => btoa(String.fromCharCode(...new Uint8Array(a)));
+  return b64(iv.buffer) + '.' + b64(ct);
+}
+
+async function dec(s) {
+  if (!s) return null;
+  try {
+    if (!_encKey) await initEncKey();
+    const [ivB64, ctB64] = s.split('.');
+    const from = b => Uint8Array.from(atob(b), c => c.charCodeAt(0));
+    const pt = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv: from(ivB64) },
+      _encKey,
+      from(ctB64)
+    );
+    return JSON.parse(new TextDecoder().decode(pt));
+  } catch { return null; }
+}
+
+// ════════════════════════════════════════════════════════════
+// APP STATE
+// ════════════════════════════════════════════════════════════
+const S = {
+  session: null,
+  role: null,               // 'operator' | 'admin'
+  currentTab: 'home',
+  currentClId: null,        // UUID checklist aperta
+  inventoryItems: [],       // cache globale articoli
+  checklists: [],           // cache lista checklist
+  currentClRows: [],        // righe checklist aperta (dirty state)
+  currentCl: null,          // testata checklist aperta
+  operatorInfo: null,       // {fullName, congregation, phone} della sessione corrente
+};
+
+// ════════════════════════════════════════════════════════════
+// DB HELPERS
+// ════════════════════════════════════════════════════════════
+async function dbGetRole(userId) {
+  const { data } = await sb.from('user_roles').select('role').eq('user_id', userId).single();
+  return data?.role ?? 'operator';
+}
+
+async function dbGetInventory() {
+  const { data, error } = await sb.from('inventory_items')
+    .select('*').order('sort_order');
+  if (error) throw error;
+  return data;
+}
+
+async function dbGetChecklists() {
+  const { data, error } = await sb.from('checklists')
+    .select('*').order('created_at', { ascending: false });
+  if (error) throw error;
+  return data;
+}
+
+async function dbGetChecklist(id) {
+  const { data, error } = await sb.from('checklists').select('*').eq('id', id).single();
+  if (error) throw error;
+  return data;
+}
+
+async function dbGetChecklistRows(clId) {
+  const { data, error } = await sb.from('checklist_rows')
+    .select('*').eq('checklist_id', clId);
+  if (error) throw error;
+  return data;
+}
+
+async function dbCreateChecklist(title, mode, operatorEnc) {
+  const { data, error } = await sb.from('checklists').insert({
+    title, mode,
+    operator_enc: operatorEnc,
+    created_by: S.session.user.id,
+    status: 'open'
+  }).select().single();
+  if (error) throw error;
+
+  // Crea una riga per ogni articolo inventario
+  const rows = S.inventoryItems.map(item => ({
+    checklist_id: data.id,
+    item_id: item.id,
+    out_qty: 0, return_qty: 0,
+    has_issue: false, check_notes: ''
+  }));
+  const { error: re } = await sb.from('checklist_rows').insert(rows);
+  if (re) throw re;
+
+  // Journal
+  await dbJournal(data.id, 'open', 'Checklist creata', operatorEnc);
+  return data;
+}
+
+async function dbUpsertRows(clId, rows, operatorEnc) {
+  const upserts = rows.map(r => ({
+    id: r.id,
+    checklist_id: clId,
+    item_id: r.item_id,
+    out_qty: r.out_qty || 0,
+    return_qty: r.return_qty || 0,
+    has_issue: r.has_issue || false,
+    check_notes: r.check_notes || '',
+    status_check: r.status_check || null,
+    status_note: r.status_note || null,
+    updated_at: new Date().toISOString()
+  }));
+  const { error } = await sb.from('checklist_rows').upsert(upserts);
+  if (error) throw error;
+  // Update checklist timestamp + operator
+  const { error: ce } = await sb.from('checklists').update({
+    updated_at: new Date().toISOString(),
+    operator_enc: operatorEnc
+  }).eq('id', clId);
+  if (ce) throw ce;
+  await dbJournal(clId, 'change', 'Righe aggiornate', operatorEnc);
+}
+
+async function dbSubmitChecklist(clId, operatorEnc) {
+  const { error } = await sb.from('checklists').update({
+    submitted_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    operator_enc: operatorEnc
+  }).eq('id', clId);
+  if (error) throw error;
+  await dbJournal(clId, 'submit', 'Checklist inviata', operatorEnc);
+}
+
+async function dbCloseChecklist(clId) {
+  const { error } = await sb.from('checklists').update({
+    status: 'closed',
+    closed_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  }).eq('id', clId);
+  if (error) throw error;
+  const opEnc = S.currentCl?.operator_enc || null;
+  await dbJournal(clId, 'close', 'Checklist chiusa dal superutente', opEnc);
+}
+
+async function dbJournal(clId, type, message, operatorEnc) {
+  await sb.from('checklist_journal').insert({
+    checklist_id: clId, type, message,
+    operator_enc: operatorEnc,
+    details: {}
+  });
+}
+
+async function dbGetAvailability() {
+  // Calcola: per ogni articolo, somma out_qty - return_qty delle checklist aperte
+  const items = S.inventoryItems;
+  const { data: cls } = await sb.from('checklists').select('id').eq('status', 'open');
+  if (!cls || cls.length === 0) return items.map(i => ({ ...i, out: 0, avail: i.quantity }));
+
+  const openIds = cls.map(c => c.id);
+  const { data: rows } = await sb.from('checklist_rows')
+    .select('item_id, out_qty, return_qty')
+    .in('checklist_id', openIds);
+
+  const out = {};
+  (rows || []).forEach(r => {
+    const net = Math.max(0, (r.out_qty || 0) - (r.return_qty || 0));
+    out[r.item_id] = (out[r.item_id] || 0) + net;
+  });
+  return items.map(i => ({
+    ...i,
+    out: out[i.id] || 0,
+    avail: Math.max(0, i.quantity - (out[i.id] || 0))
+  }));
+}
+
+// ════════════════════════════════════════════════════════════
+// UI UTILITIES
+// ════════════════════════════════════════════════════════════
+function showLoading(v) {
+  document.getElementById('loading-overlay').classList.toggle('hidden', !v);
+}
+
+let _toastTimer = null;
+function showToast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show' + (type ? ' ' + type : '');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => { el.className = ''; }, 3200);
+}
+
+function navigate(tab) {
+  if (tab === S.currentTab) return;
+  S.currentTab = tab;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  const map = {
+    home: 'page-home',
+    checklists: 'page-checklists',
+    inventory: 'page-inventory',
+    admin: 'page-admin'
+  };
+  document.getElementById(map[tab])?.classList.add('active');
+  if (tab === 'home') renderHome();
+  if (tab === 'checklists') renderChecklists();
+  if (tab === 'inventory') renderInventory();
+  if (tab === 'admin') renderAdmin();
+}
+
+function openClDetail(clId) {
+  S.currentClId = clId;
+  S.currentTab = 'cl-detail';
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-cl-detail').classList.add('active');
+  renderClDetail();
+}
+
+function fmtDate(iso) {
+  if (!iso) return '–';
+  const d = new Date(iso);
+  return d.toLocaleDateString('it-IT', { day:'2-digit', month:'short', year:'2-digit' });
+}
+
+function fmtDateTime(iso) {
+  if (!iso) return '–';
+  const d = new Date(iso);
+  return d.toLocaleDateString('it-IT', { day:'2-digit', month:'2-digit', year:'2-digit' }) +
+    ' ' + d.toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' });
+}
+
+function statusBadge(cl) {
+  if (cl.status === 'closed')     return '<span class="badge badge-closed">Chiusa</span>';
+  if (cl.submitted_at)            return '<span class="badge badge-submit">Inviata</span>';
+  return '<span class="badge badge-open">Aperta</span>';
+}
+
+function modeLabel(mode) {
+  return mode === 'return' ? 'Rientro' : 'Uscita';
+}
+
+// Section color map
+const SEC_COLORS = [
+  '#6366F1','#8B5CF6','#EC4899','#EF4444',
+  '#F59E0B','#10B981','#06B6D4','#3B82F6',
+  '#84CC16','#F97316'
+];
+const _secColorCache = {};
+function sectionColor(section) {
+  if (!_secColorCache[section]) {
+    const keys = Object.keys(_secColorCache).length;
+    _secColorCache[section] = SEC_COLORS[keys % SEC_COLORS.length];
+  }
+  return _secColorCache[section];
+}
+
+function parseSection(desc) {
+  const m = desc.match(/^([^-]+)/);
+  return m ? m[1].trim() : desc;
+}
+
+// Group items by section
+function groupBySection(items) {
+  const groups = {};
+  items.forEach(item => {
+    const sec = parseSection(item.description);
+    if (!groups[sec]) groups[sec] = [];
+    groups[sec].push(item);
+  });
+  return groups;
+}
+
+// ════════════════════════════════════════════════════════════
+// RENDER — HOME
+// ════════════════════════════════════════════════════════════
+async function renderHome() {
+  showLoading(true);
+  try {
+    const [cls, items] = await Promise.all([
+      dbGetChecklists(),
+      S.inventoryItems.length ? Promise.resolve(S.inventoryItems) : dbGetInventory()
+    ]);
+    S.inventoryItems = items;
+    S.checklists = cls;
+
+    const open   = cls.filter(c => c.status === 'open').length;
+    const closed = cls.filter(c => c.status === 'closed').length;
+    const issues = cls.reduce((n, c) => n, 0); // placeholder
+
+    document.getElementById('stat-open').textContent   = open;
+    document.getElementById('stat-items').textContent  = items.length;
+    document.getElementById('stat-issues').textContent = '–';
+    document.getElementById('stat-closed').textContent = closed;
+    document.getElementById('home-subtitle').textContent =
+      `${items.length} articoli · ${open} checklist aperte`;
+
+    const recent = cls.slice(0, 4);
+    const el = document.getElementById('home-recent');
+    if (!recent.length) {
+      el.innerHTML = '<div class="card t-muted t-small" style="text-align:center;padding:24px">Nessuna checklist ancora.</div>';
+    } else {
+      el.innerHTML = recent.map(c => `
+        <div class="card card-tap" style="margin-bottom:10px;cursor:pointer" data-cl="${c.id}">
+          <div style="display:flex;align-items:flex-start;gap:10px">
+            <div style="flex:1;min-width:0">
+              <div class="t-h3" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.title)}</div>
+              <div class="t-meta" style="margin-top:3px">${modeLabel(c.mode)} · ${fmtDate(c.created_at)}</div>
+            </div>
+            ${statusBadge(c)}
+          </div>
+        </div>`).join('');
+      el.querySelectorAll('[data-cl]').forEach(el =>
+        el.addEventListener('click', () => openClDetail(el.dataset.cl))
+      );
+    }
+  } finally { showLoading(false); }
+}
+
+// ════════════════════════════════════════════════════════════
+// RENDER — CHECKLISTS LIST
+// ════════════════════════════════════════════════════════════
+async function renderChecklists() {
+  showLoading(true);
+  try {
+    const cls = await dbGetChecklists();
+    S.checklists = cls;
+    document.getElementById('cl-count-label').textContent =
+      `${cls.length} checklist totali`;
+
+    if (S.role === 'admin')
+      document.getElementById('fab-new-cl').classList.remove('hidden');
+
+    const el = document.getElementById('cl-list');
+    if (!cls.length) {
+      el.innerHTML = `<div class="empty-state">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+        </svg>
+        <div class="t-h3">Nessuna checklist</div>
+        <div class="t-small t-muted">Chiedi all'admin di crearne una.</div>
+      </div>`;
+      return;
+    }
+
+    el.innerHTML = cls.map(c => `
+      <div class="card card-tap" style="margin-bottom:10px;cursor:pointer" data-cl="${c.id}">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+          <div style="flex:1;min-width:0">
+            <div class="t-h3" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.title)}</div>
+            <div class="t-meta" style="margin-top:4px">
+              ${modeLabel(c.mode)} · Creata ${fmtDate(c.created_at)}
+              ${c.submitted_at ? ' · Inviata ' + fmtDate(c.submitted_at) : ''}
+            </div>
+          </div>
+          ${statusBadge(c)}
+        </div>
+      </div>`).join('');
+
+    el.querySelectorAll('[data-cl]').forEach(card =>
+      card.addEventListener('click', () => openClDetail(card.dataset.cl))
+    );
+  } finally { showLoading(false); }
+}
+
+// ════════════════════════════════════════════════════════════
+// RENDER — CHECKLIST DETAIL
+// ════════════════════════════════════════════════════════════
+async function renderClDetail() {
+  showLoading(true);
+  try {
+    const [cl, dbRows] = await Promise.all([
+      dbGetChecklist(S.currentClId),
+      dbGetChecklistRows(S.currentClId)
+    ]);
+    S.currentCl = cl;
+
+    // Build dirty state map: item_id → row (with local edits)
+    const rowMap = {};
+    dbRows.forEach(r => { rowMap[r.item_id] = { ...r }; });
+    // Initialize missing items
+    S.inventoryItems.forEach(item => {
+      if (!rowMap[item.id]) rowMap[item.id] = {
+        id: null, checklist_id: cl.id, item_id: item.id,
+        out_qty: 0, return_qty: 0, has_issue: false, check_notes: ''
+      };
+    });
+    S.currentClRows = Object.values(rowMap);
+
+    // Header
+    document.getElementById('cl-detail-title').textContent = cl.title;
+    document.getElementById('cl-detail-badge').innerHTML =
+      `${statusBadge(cl)} <span class="badge badge-neutral" style="margin-left:4px">${modeLabel(cl.mode)}</span>`;
+
+    // Operator info
+    const opBar = document.getElementById('cl-operator-text');
+    if (cl.operator_enc) {
+      const op = await dec(cl.operator_enc);
+      if (op) opBar.textContent = `${op.fullName} · ${op.congregation} · ${op.phone}`;
+      else opBar.textContent = '(dati operatore cifrati)';
+    } else {
+      opBar.textContent = 'Operatore non specificato';
+    }
+
+    // Buttons
+    const isClosed = cl.status === 'closed';
+    const isAdmin  = S.role === 'admin';
+    document.getElementById('btn-cl-save').classList.toggle('hidden', isClosed);
+    document.getElementById('btn-cl-submit').classList.toggle('hidden', isClosed || !!cl.submitted_at);
+    document.getElementById('btn-cl-close').classList.toggle('hidden', !isAdmin || isClosed);
+    document.getElementById('btn-cl-export').classList.toggle('hidden', !isAdmin);
+
+    buildClRows('');
+  } finally { showLoading(false); }
+}
+
+function buildClRows(filter) {
+  const area = document.getElementById('cl-rows-area');
+  const cl   = S.currentCl;
+  const isClosed = cl.status === 'closed';
+  const isReturn = cl.mode === 'return';
+  const f = filter.toLowerCase().trim();
+
+  // Map item details
+  const itemMap = {};
+  S.inventoryItems.forEach(i => { itemMap[i.id] = i; });
+
+  const filtered = S.currentClRows.filter(r => {
+    const item = itemMap[r.item_id];
+    if (!item) return false;
+    if (f && !item.description.toLowerCase().includes(f)) return false;
+    return true;
+  });
+
+  // Group by section
+  const groups = {};
+  filtered.forEach(r => {
+    const item = itemMap[r.item_id];
+    const sec = parseSection(item.description);
+    if (!groups[sec]) groups[sec] = [];
+    groups[sec].push({ row: r, item });
+  });
+
+  if (!filtered.length) {
+    area.innerHTML = '<div class="empty-state"><div class="t-small t-muted">Nessun articolo trovato.</div></div>';
+    return;
+  }
+
+  let html = '';
+  Object.entries(groups).forEach(([sec, entries]) => {
+    const color = sectionColor(sec);
+    html += `<div class="inv-section-header">
+      <div class="inv-section-dot" style="background:${color}"></div>
+      <span class="t-h3">${esc(sec)}</span>
+      <span class="t-meta" style="margin-left:auto">${entries.length} articoli</span>
+    </div>`;
+    entries.forEach(({ row, item }) => {
+      const hasChanges = row.out_qty > 0 || row.return_qty > 0 || row.has_issue;
+      const hasIssue   = row.has_issue;
+      html += `<div class="cl-row ${hasIssue ? 'has-issue' : hasChanges ? 'has-changes' : ''}" data-item="${item.id}">
+        <div class="cl-row-name">${esc(itemName(item.description))}</div>
+        <div class="cl-row-meta">Max: ${item.quantity}${item.notes ? ' · ' + esc(item.notes.substring(0,60)) : ''}</div>
+        <div class="cl-qty-cols">
+          ${!isReturn ? `<div>
+            <div class="cl-qty-label">Uscita</div>
+            <div class="qty-row">
+              <button class="qty-btn" data-action="dec" data-field="out_qty" data-item="${item.id}" ${isClosed?'disabled':''}>−</button>
+              <input class="qty-input" type="number" min="0" max="${item.quantity}"
+                     value="${row.out_qty || 0}" data-field="out_qty" data-item="${item.id}"
+                     ${isClosed?'readonly':''}>
+              <button class="qty-btn" data-action="inc" data-field="out_qty" data-item="${item.id}" ${isClosed?'disabled':''}>+</button>
+            </div>
+          </div>` : ''}
+          ${isReturn || true ? `<div>
+            <div class="cl-qty-label">Rientro</div>
+            <div class="qty-row">
+              <button class="qty-btn" data-action="dec" data-field="return_qty" data-item="${item.id}" ${isClosed?'disabled':''}>−</button>
+              <input class="qty-input" type="number" min="0" max="${item.quantity}"
+                     value="${row.return_qty || 0}" data-field="return_qty" data-item="${item.id}"
+                     ${isClosed?'readonly':''}>
+              <button class="qty-btn" data-action="inc" data-field="return_qty" data-item="${item.id}" ${isClosed?'disabled':''}>+</button>
+            </div>
+          </div>` : ''}
+        </div>
+        ${!isClosed ? `<div style="margin-top:10px;display:flex;align-items:center;gap:10px">
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--warning)">
+            <input type="checkbox" data-field="has_issue" data-item="${item.id}"
+                   ${row.has_issue ? 'checked' : ''}>
+            Problema
+          </label>
+          <input class="form-control" type="text" placeholder="Note…"
+                 style="flex:1;padding:8px 10px;font-size:13px"
+                 data-field="check_notes" data-item="${item.id}"
+                 value="${esc(row.check_notes || '')}">
+        </div>` : `${row.has_issue || row.check_notes ? `
+          <div style="margin-top:8px;font-size:12px;color:var(--warning)">
+            ${row.has_issue ? '⚠ Problema' : ''} ${row.check_notes ? '· ' + esc(row.check_notes) : ''}
+          </div>` : ''}`}
+      </div>`;
+    });
+  });
+
+  area.innerHTML = html;
+
+  // Wire events
+  area.querySelectorAll('.qty-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const { action, field, item: itemId } = btn.dataset;
+      const row = S.currentClRows.find(r => r.item_id === itemId);
+      const inv = itemMap[itemId];
+      if (!row || !inv) return;
+      let val = row[field] || 0;
+      val = action === 'inc' ? Math.min(val + 1, inv.quantity) : Math.max(val - 1, 0);
+      row[field] = val;
+      const input = area.querySelector(`input[data-field="${field}"][data-item="${itemId}"]`);
+      if (input) input.value = val;
+      // visual feedback
+      const card = btn.closest('.cl-row');
+      if (card) card.classList.toggle('has-changes', val > 0 || row.has_issue);
+    });
+  });
+
+  area.querySelectorAll('input[data-field]').forEach(input => {
+    input.addEventListener('change', () => {
+      const { field, item: itemId } = input.dataset;
+      const row = S.currentClRows.find(r => r.item_id === itemId);
+      if (!row) return;
+      if (field === 'has_issue') {
+        row.has_issue = input.checked;
+        const card = input.closest('.cl-row');
+        if (card) card.classList.toggle('has-issue', input.checked);
+      } else if (field === 'check_notes') {
+        row.check_notes = input.value;
+      } else {
+        const inv = itemMap[itemId];
+        const v = Math.max(0, Math.min(parseInt(input.value) || 0, inv?.quantity || 9999));
+        row[field] = v;
+        input.value = v;
+      }
+    });
+  });
+}
+
+function itemName(description) {
+  // Remove section prefix
+  const m = description.match(/^[^-]+-\s*(.+)/);
+  return m ? m[1].trim() : description;
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ════════════════════════════════════════════════════════════
+// RENDER — INVENTORY
+// ════════════════════════════════════════════════════════════
+async function renderInventory() {
+  showLoading(true);
+  try {
+    if (!S.inventoryItems.length) S.inventoryItems = await dbGetInventory();
+    const items = S.inventoryItems;
+    document.getElementById('inv-count-label').textContent = `${items.length} articoli`;
+    buildInvList('');
+  } finally { showLoading(false); }
+}
+
+function buildInvList(filter) {
+  const f = filter.toLowerCase().trim();
+  const items = S.inventoryItems.filter(i =>
+    !f || i.description.toLowerCase().includes(f) || i.notes.toLowerCase().includes(f)
+  );
+  const groups = groupBySection(items);
+  const el = document.getElementById('inv-list');
+
+  if (!items.length) {
+    el.innerHTML = '<div class="empty-state"><div class="t-small t-muted">Nessun articolo trovato.</div></div>';
+    return;
+  }
+
+  let html = '';
+  Object.entries(groups).forEach(([sec, gitems]) => {
+    const color = sectionColor(sec);
+    html += `<div class="inv-section-header">
+      <div class="inv-section-dot" style="background:${color}"></div>
+      <span class="t-h3">${esc(sec)}</span>
+      <span class="t-meta" style="margin-left:auto">${gitems.length}</span>
+    </div>`;
+    gitems.forEach(item => {
+      html += `<div class="inv-item-card">
+        <div style="display:flex;align-items:flex-start;gap:8px">
+          <div style="flex:1;min-width:0">
+            <div class="inv-item-name">${esc(itemName(item.description))}</div>
+            ${item.notes ? `<div class="inv-item-meta">${esc(item.notes.substring(0,80))}${item.notes.length>80?'…':''}</div>` : ''}
+          </div>
+          <span class="badge badge-neutral" style="flex-shrink:0">${item.quantity}</span>
+        </div>
+      </div>`;
+    });
+  });
+  el.innerHTML = html;
+}
+
+// ════════════════════════════════════════════════════════════
+// RENDER — ADMIN
+// ════════════════════════════════════════════════════════════
+async function renderAdmin() {
+  showLoading(true);
+  try {
+    const [avail, cls] = await Promise.all([
+      dbGetAvailability(),
+      dbGetChecklists()
+    ]);
+
+    // Availability table (only items with out > 0)
+    const withOut = avail.filter(a => a.out > 0);
+    const availEl = document.getElementById('admin-avail');
+    if (!withOut.length) {
+      availEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-3);font-size:13px">Tutto il materiale è disponibile.</div>';
+    } else {
+      availEl.innerHTML = `
+        <div class="avail-row header">
+          <div>Articolo</div>
+          <div class="avail-num">Tot.</div>
+          <div class="avail-num">Uscito</div>
+          <div class="avail-num">Disp.</div>
+        </div>
+        ${withOut.map(a => `
+          <div class="avail-row">
+            <div style="font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(itemName(a.description))}</div>
+            <div class="avail-num">${a.quantity}</div>
+            <div class="avail-num out">${a.out}</div>
+            <div class="avail-num ${a.avail === 0 ? 'zero' : 'avail'}">${a.avail}</div>
+          </div>`).join('')}`;
+    }
+
+    // Checklist admin list
+    const clEl = document.getElementById('admin-cl-list');
+    if (!cls.length) {
+      clEl.innerHTML = '<div class="card t-muted t-small" style="text-align:center;padding:20px">Nessuna checklist.</div>';
+    } else {
+      clEl.innerHTML = cls.map(c => `
+        <div class="card" style="margin-bottom:10px">
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:12px">
+            <div style="flex:1;min-width:0">
+              <div class="t-h3" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.title)}</div>
+              <div class="t-meta" style="margin-top:3px">${modeLabel(c.mode)} · ${fmtDateTime(c.created_at)}</div>
+            </div>
+            ${statusBadge(c)}
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-sm btn-secondary" data-action="open-cl" data-id="${c.id}">
+              Apri
+            </button>
+            <button class="btn btn-sm btn-secondary" data-action="export-cl" data-id="${c.id}">
+              Export .xlsx
+            </button>
+            ${c.status !== 'closed' ? `<button class="btn btn-sm btn-success" data-action="close-cl" data-id="${c.id}">Chiudi</button>` : ''}
+          </div>
+        </div>`).join('');
+
+      clEl.querySelectorAll('[data-action]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const { action, id } = btn.dataset;
+          if (action === 'open-cl') { openClDetail(id); return; }
+          if (action === 'close-cl') {
+            showLoading(true);
+            try {
+              S.currentClId = id;
+              S.currentCl = await dbGetChecklist(id);
+              await dbCloseChecklist(id);
+              showToast('Checklist chiusa.', 'success');
+              await renderAdmin();
+            } catch(e) { showToast(e.message, 'error'); showLoading(false); }
+          }
+          if (action === 'export-cl') {
+            S.currentClId = id;
+            S.currentCl = await dbGetChecklist(id);
+            S.currentClRows = await dbGetChecklistRows(id);
+            exportXlsx();
+          }
+        });
+      });
+    }
+  } finally { showLoading(false); }
+}
+
+// ════════════════════════════════════════════════════════════
+// EXCEL EXPORT  (SheetJS)
+// ════════════════════════════════════════════════════════════
+async function exportXlsx() {
+  const cl = S.currentCl;
+  if (!cl) return;
+  showLoading(true);
+  try {
+    const itemMap = {};
+    S.inventoryItems.forEach(i => { itemMap[i.id] = i; });
+
+    // Decrypt operator info
+    let opLabel = 'Operatore sconosciuto';
+    if (cl.operator_enc) {
+      const op = await dec(cl.operator_enc);
+      if (op) opLabel = `${op.fullName} - ${op.congregation} - ${op.phone}`;
+    }
+
+    const rows = S.currentClRows;
+    const data = [
+      ['CEPC Inventario Vicenza'],
+      [`Checklist: ${cl.title}`],
+      [`Tipo: ${modeLabel(cl.mode)}`],
+      [`Operatore: ${opLabel}`],
+      [`Creata: ${fmtDateTime(cl.created_at)}`],
+      [],
+      ['Sezione','Articolo','Qta Tot.','Uscita','Rientro','Differenza','Problema','Note'],
+    ];
+
+    rows.forEach(r => {
+      const item = itemMap[r.item_id];
+      if (!item) return;
+      data.push([
+        parseSection(item.description),
+        itemName(item.description),
+        item.quantity,
+        r.out_qty || 0,
+        r.return_qty || 0,
+        (r.out_qty || 0) - (r.return_qty || 0),
+        r.has_issue ? 'SI' : '',
+        r.check_notes || ''
+      ]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(data);
+
+    // Column widths
+    ws['!cols'] = [
+      {wch:18},{wch:40},{wch:8},{wch:8},{wch:8},{wch:10},{wch:10},{wch:30}
+    ];
+
+    // Highlight issue rows (orange bg)
+    const headerRow = 7; // 1-indexed row where data starts
+    data.slice(7).forEach((row, i) => {
+      if (row[6] === 'SI') {
+        const excelRow = headerRow + i + 1;
+        for (let c = 0; c < 8; c++) {
+          const addr = XLSX.utils.encode_cell({ r: excelRow - 1, c });
+          if (!ws[addr]) ws[addr] = { v: '', t: 's' };
+          ws[addr].s = { fill: { fgColor: { rgb: 'FCE4D6' } } };
+        }
+      }
+    });
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Checklist');
+
+    const stamp = new Date().toISOString().replace(/[-:T]/g,'').substring(0,12);
+    const mode  = cl.mode === 'return' ? 'rientro' : 'uscita';
+    XLSX.writeFile(wb, `inventario-vicenza-${mode}-${stamp}.xlsx`);
+    showToast('File scaricato.', 'success');
+  } catch(e) {
+    showToast('Errore export: ' + e.message, 'error');
+  } finally { showLoading(false); }
+}
+
+// ════════════════════════════════════════════════════════════
+// OPERATOR INFO — save / ask
+// ════════════════════════════════════════════════════════════
+function askOperatorInfo(cb) {
+  const modal = document.getElementById('modal-operator');
+  modal.classList.remove('hidden');
+  // Pre-fill if already have info in session
+  if (S.operatorInfo) {
+    document.getElementById('op-fullname').value     = S.operatorInfo.fullName || '';
+    document.getElementById('op-congregation').value = S.operatorInfo.congregation || '';
+    document.getElementById('op-phone').value        = S.operatorInfo.phone || '';
+  }
+  document.getElementById('btn-op-confirm').onclick = () => {
+    const fn = document.getElementById('op-fullname').value.trim();
+    const cg = document.getElementById('op-congregation').value.trim();
+    const ph = document.getElementById('op-phone').value.trim();
+    if (!fn) { showToast('Inserisci nome e cognome.', 'error'); return; }
+    S.operatorInfo = { fullName: fn, congregation: cg, phone: ph };
+    modal.classList.add('hidden');
+    cb(S.operatorInfo);
+  };
+}
+
+// ════════════════════════════════════════════════════════════
+// EVENT WIRING
+// ════════════════════════════════════════════════════════════
+function wireEvents() {
+  // Bottom nav
+  document.querySelectorAll('.nav-tab[data-tab]').forEach(tab =>
+    tab.addEventListener('click', () => navigate(tab.dataset.tab))
+  );
+
+  // Login
+  document.getElementById('btn-login').addEventListener('click', handleLogin);
+  document.getElementById('inp-pass').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleLogin();
+  });
+
+  // Back from detail
+  document.getElementById('cl-detail-back').addEventListener('click', () => {
+    S.currentClId = null;
+    navigate('checklists');
+  });
+
+  // FAB new checklist
+  document.getElementById('fab-new-cl').addEventListener('click', () =>
+    document.getElementById('modal-new-cl').classList.remove('hidden')
+  );
+
+  // Modal new cl - cancel
+  document.getElementById('btn-modal-new-cancel').addEventListener('click', () =>
+    document.getElementById('modal-new-cl').classList.add('hidden')
+  );
+
+  // Modal new cl - confirm
+  document.getElementById('btn-modal-new-confirm').addEventListener('click', async () => {
+    const title = document.getElementById('new-cl-title').value.trim();
+    const mode  = document.getElementById('new-cl-mode').value;
+    if (!title) { showToast('Inserisci un titolo.', 'error'); return; }
+    document.getElementById('modal-new-cl').classList.add('hidden');
+
+    askOperatorInfo(async (op) => {
+      showLoading(true);
+      try {
+        const opEnc = await enc(op);
+        const cl = await dbCreateChecklist(title, mode, opEnc);
+        document.getElementById('new-cl-title').value = '';
+        showToast('Checklist creata!', 'success');
+        openClDetail(cl.id);
+      } catch(e) { showToast(e.message, 'error'); }
+      finally { showLoading(false); }
+    });
+  });
+
+  // Checklist detail actions
+  document.getElementById('btn-cl-save').addEventListener('click', async () => {
+    const action = async (op) => {
+      showLoading(true);
+      try {
+        const opEnc = await enc(op);
+        await dbUpsertRows(S.currentClId, S.currentClRows, opEnc);
+        showToast('Salvato!', 'success');
+      } catch(e) { showToast(e.message, 'error'); }
+      finally { showLoading(false); }
+    };
+    if (S.operatorInfo) action(S.operatorInfo);
+    else askOperatorInfo(action);
+  });
+
+  document.getElementById('btn-cl-submit').addEventListener('click', async () => {
+    const action = async (op) => {
+      showLoading(true);
+      try {
+        const opEnc = await enc(op);
+        await dbUpsertRows(S.currentClId, S.currentClRows, opEnc);
+        await dbSubmitChecklist(S.currentClId, opEnc);
+        showToast('Checklist inviata!', 'success');
+        await renderClDetail();
+      } catch(e) { showToast(e.message, 'error'); }
+      finally { showLoading(false); }
+    };
+    if (S.operatorInfo) action(S.operatorInfo);
+    else askOperatorInfo(action);
+  });
+
+  document.getElementById('btn-cl-close').addEventListener('click', async () => {
+    showLoading(true);
+    try {
+      await dbCloseChecklist(S.currentClId);
+      showToast('Checklist chiusa.', 'success');
+      await renderClDetail();
+    } catch(e) { showToast(e.message, 'error'); }
+    finally { showLoading(false); }
+  });
+
+  document.getElementById('btn-cl-export').addEventListener('click', exportXlsx);
+
+  // Search bars
+  let invTimer, clTimer;
+  document.getElementById('inv-search').addEventListener('input', e => {
+    clearTimeout(invTimer);
+    invTimer = setTimeout(() => buildInvList(e.target.value), 200);
+  });
+  document.getElementById('cl-search').addEventListener('input', e => {
+    clearTimeout(clTimer);
+    clTimer = setTimeout(() => buildClRows(e.target.value), 200);
+  });
+
+  // Close modals on backdrop click
+  document.getElementById('modal-new-cl').addEventListener('click', e => {
+    if (e.target === e.currentTarget)
+      document.getElementById('modal-new-cl').classList.add('hidden');
+  });
+  document.getElementById('modal-operator').addEventListener('click', e => {
+    if (e.target === e.currentTarget)
+      document.getElementById('modal-operator').classList.add('hidden');
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+// AUTH
+// ════════════════════════════════════════════════════════════
+async function handleLogin() {
+  const email = document.getElementById('inp-email').value.trim();
+  const pass  = document.getElementById('inp-pass').value;
+  const errEl = document.getElementById('login-error');
+  errEl.classList.remove('visible');
+  const btn = document.getElementById('btn-login');
+  btn.disabled = true;
+  btn.textContent = 'Accesso in corso…';
+
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+    if (error) throw error;
+    S.session = data.session;
+    S.role    = await dbGetRole(data.user.id);
+    await initEncKey();
+    await onLoginSuccess();
+  } catch(e) {
+    errEl.textContent = 'Credenziali non valide. Riprova.';
+    errEl.classList.add('visible');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Accedi';
+  }
+}
+
+async function onLoginSuccess() {
+  // Show app, hide login
+  document.getElementById('page-login').classList.add('hidden');
+  document.getElementById('app-shell').classList.remove('hidden');
+
+  // Show admin tab if admin
+  if (S.role === 'admin') {
+    document.getElementById('nav-admin-tab').classList.remove('hidden');
+  }
+
+  // Prefetch inventory
+  S.inventoryItems = await dbGetInventory();
+
+  navigate('home');
+}
+
+// ════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════
+async function init() {
+  wireEvents();
+
+  // Check existing session
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    S.session = session;
+    S.role    = await dbGetRole(session.user.id);
+    await initEncKey();
+    await onLoginSuccess();
+  }
+
+  // Auth state changes (logout from another tab, etc.)
+  sb.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_OUT') {
+      S.session = null;
+      S.role    = null;
+      document.getElementById('app-shell').classList.add('hidden');
+      document.getElementById('page-login').classList.remove('hidden');
+    }
+  });
+}
+
+init().catch(console.error);
+</script>
+</body>
+</html>
