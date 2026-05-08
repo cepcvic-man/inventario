@@ -12,40 +12,39 @@
        DESIGN SYSTEM
     ═══════════════════════════════════════════ */
     :root {
-      --bg:          #F0F4FF;
-      --bg-alt:      #E8EDFC;
-      --surface:     #FFFFFF;
-      --surface-alt: #F7F9FF;
+      --bg:          oklch(97.5% 0.006 75);
+      --bg-alt:      oklch(94%   0.010 75);
+      --surface:     oklch(99.5% 0.002 75);
+      --surface-alt: oklch(96.5% 0.007 75);
 
-      --primary:     #6366F1;
-      --primary-d:   #4F46E5;
-      --primary-soft:#EEF2FF;
-      --primary-muted: rgba(99,102,241,.12);
+      --primary:     oklch(38%  0.13 155);
+      --primary-d:   oklch(30%  0.13 155);
+      --primary-soft:oklch(94%  0.04 155);
 
-      --accent:      #8B5CF6;
-      --accent-soft: #F5F3FF;
+      --accent:      oklch(65%  0.18 58);
+      --accent-soft: oklch(96%  0.04 75);
 
-      --success:     #10B981;
-      --success-soft:#ECFDF5;
-      --warning:     #F59E0B;
-      --warning-soft:#FFFBEB;
-      --danger:      #EF4444;
-      --danger-soft: #FEF2F2;
+      --success:     oklch(48%  0.18 155);
+      --success-soft:oklch(95%  0.05 155);
+      --warning:     oklch(64%  0.22 55);
+      --warning-soft:oklch(97%  0.05 75);
+      --danger:      oklch(55%  0.22 25);
+      --danger-soft: oklch(97%  0.04 25);
 
-      --text:        #1E293B;
-      --text-2:      #475569;
-      --text-3:      #94A3B8;
-      --border:      #E2E8F0;
+      --text:        oklch(20%  0.012 75);
+      --text-2:      oklch(45%  0.015 75);
+      --text-3:      oklch(68%  0.010 75);
+      --border:      oklch(90%  0.010 75);
 
-      --shadow-sm:   0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
-      --shadow:      0 4px 16px rgba(99,102,241,.08), 0 2px 6px rgba(0,0,0,.05);
-      --shadow-md:   0 8px 32px rgba(99,102,241,.12), 0 4px 12px rgba(0,0,0,.06);
+      --shadow-sm:   0 1px 3px rgb(0 0 0 / .05), 0 1px 2px rgb(0 0 0 / .03);
+      --shadow:      0 4px 12px rgb(0 0 0 / .08);
+      --shadow-md:   0 8px 24px rgb(0 0 0 / .10);
 
-      --radius:      16px;
-      --radius-sm:   10px;
+      --radius:      14px;
+      --radius-sm:   9px;
       --radius-xs:   6px;
 
-      --nav-h:       68px;
+      --nav-h:       64px;
       --safe-bottom: env(safe-area-inset-bottom, 0px);
       --font:        'Inter', system-ui, sans-serif;
     }
@@ -75,10 +74,9 @@
     /* ═══════════════════════════════════════════
        TYPOGRAPHY
     ═══════════════════════════════════════════ */
-    .t-hero  { font-size: clamp(28px,7vw,34px); font-weight: 800; letter-spacing: -.5px; line-height: 1.15; }
-    .t-title { font-size: 22px; font-weight: 700; letter-spacing: -.3px; }
-    .t-h2    { font-size: 18px; font-weight: 600; }
-    .t-h3    { font-size: 16px; font-weight: 600; }
+    .t-title { font-size: 22px; font-weight: 700; letter-spacing: -.25px; }
+    .t-h2    { font-size: 18px; font-weight: 600; letter-spacing: -.15px; }
+    .t-h3    { font-size: 15px; font-weight: 600; }
     .t-body  { font-size: 15px; }
     .t-small { font-size: 13px; }
     .t-meta  { font-size: 12px; color: var(--text-3); }
@@ -160,15 +158,11 @@
     }
     .card + .card { margin-top: 10px; }
 
-    .card-hero {
-      background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
-      color: #fff;
-      border-radius: var(--radius);
-      padding: 24px 20px;
-      box-shadow: var(--shadow-md);
-      border: none;
+    .home-header {
+      padding: 52px 20px 20px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
     }
-    .card-hero .t-muted { color: rgba(255,255,255,.72); }
 
     .card-tap {
       transition: transform .12s ease, box-shadow .12s ease;
@@ -192,7 +186,7 @@
       white-space: nowrap;
     }
     .badge-open    { background: var(--primary-soft);  color: var(--primary); }
-    .badge-closed  { background: #F1F5F9;               color: var(--text-2); }
+    .badge-closed  { background: var(--bg-alt);         color: var(--text-2); }
     .badge-submit  { background: var(--success-soft);   color: var(--success); }
     .badge-issue   { background: var(--warning-soft);   color: var(--warning); }
     .badge-danger  { background: var(--danger-soft);    color: var(--danger); }
@@ -238,6 +232,7 @@
     .nav-tab span { font-size: 11px; font-weight: 500; }
     .nav-tab.active { color: var(--primary); }
     .nav-tab.active svg { stroke: var(--primary); }
+    .nav-tab.active span { font-weight: 600; }
     .nav-tab-dot {
       position: absolute;
       top: 10px;
@@ -272,7 +267,7 @@
     }
     .form-control:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px var(--primary-muted);
+      box-shadow: 0 0 0 3px var(--primary-soft);
     }
     .form-control::placeholder { color: var(--text-3); }
 
@@ -338,7 +333,7 @@
       -webkit-tap-highlight-color: transparent;
     }
     .btn:active { opacity: .82; transform: scale(.98); }
-    .btn-primary   { background: var(--primary);   color: #fff; box-shadow: 0 4px 14px rgba(99,102,241,.35); }
+    .btn-primary   { background: var(--primary);   color: oklch(99% 0.004 75); }
     .btn-secondary { background: var(--primary-soft); color: var(--primary); }
     .btn-danger    { background: var(--danger-soft);  color: var(--danger); }
     .btn-success   { background: var(--success-soft); color: var(--success); }
@@ -353,12 +348,12 @@
       position: fixed;
       bottom: calc(var(--nav-h) + var(--safe-bottom) + 16px);
       right: 16px;
-      width: 56px; height: 56px;
-      border-radius: 50%;
+      width: 52px; height: 52px;
+      border-radius: 14px;
       background: var(--primary);
-      color: #fff;
+      color: oklch(99% 0.004 75);
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 6px 20px rgba(99,102,241,.45);
+      box-shadow: var(--shadow-md);
       z-index: 50;
       transition: transform .15s;
     }
@@ -388,7 +383,7 @@
       bottom: calc(var(--nav-h) + var(--safe-bottom) + 12px);
       left: 16px; right: 16px;
       background: var(--text);
-      color: #fff;
+      color: oklch(99% 0.002 75);
       padding: 14px 18px;
       border-radius: var(--radius-sm);
       font-size: 14px;
@@ -411,10 +406,9 @@
     #loading-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(240,244,255,.85);
+      background: rgb(255 255 255 / .88);
       display: flex; align-items: center; justify-content: center;
       z-index: 300;
-      backdrop-filter: blur(4px);
     }
     .spinner {
       width: 36px; height: 36px;
@@ -431,7 +425,7 @@
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(15,23,42,.5);
+      background: oklch(15% 0.01 75 / 0.5);
       z-index: 150;
       display: flex;
       align-items: flex-end;
@@ -460,22 +454,7 @@
     }
     .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
 
-    /* ═══════════════════════════════════════════
-       STAT CARDS
-    ═══════════════════════════════════════════ */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    .stat-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-    }
-    .stat-value { font-size: 28px; font-weight: 800; color: var(--primary); line-height: 1; }
-    .stat-label { font-size: 12px; color: var(--text-2); margin-top: 4px; }
+    /* stat grid removed — replaced by home-header + checklist list */
 
     /* ═══════════════════════════════════════════
        INVENTORY SECTION GROUPS
@@ -516,7 +495,7 @@
       margin: 0 16px 8px;
     }
     .cl-row.has-issue { border-color: var(--warning); background: var(--warning-soft); }
-    .cl-row.has-changes { border-color: var(--primary); }
+    .cl-row.has-changes { border-color: var(--primary); background: var(--primary-soft); }
     .cl-row-name { font-size: 14px; font-weight: 600; }
     .cl-row-meta { font-size: 12px; color: var(--text-3); margin-bottom: 10px; margin-top: 2px; }
     .cl-qty-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -553,7 +532,7 @@
       font-size: 14px;
       outline: none;
     }
-    .search-input:focus { border-color: var(--primary); }
+    .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); outline: none; }
 
     /* ═══════════════════════════════════════════
        EMPTY STATE
@@ -582,19 +561,18 @@
       background: var(--bg);
     }
     .login-logo {
-      width: 72px; height: 72px;
-      background: linear-gradient(135deg, #6366F1, #8B5CF6);
-      border-radius: 22px;
+      width: 64px; height: 64px;
+      background: var(--primary);
+      border-radius: 18px;
       display: flex; align-items: center; justify-content: center;
-      margin-bottom: 24px;
-      box-shadow: 0 8px 24px rgba(99,102,241,.35);
+      margin-bottom: 28px;
     }
     .login-card {
       width: 100%;
       max-width: 380px;
       background: var(--surface);
-      border-radius: 24px;
-      padding: 28px 24px;
+      border-radius: var(--radius);
+      padding: 24px 20px;
       box-shadow: var(--shadow-md);
       border: 1px solid var(--border);
     }
@@ -685,23 +663,17 @@
 <div id="app-shell" class="hidden">
 
   <!-- ── HOME ── -->
-  <div id="page-home" class="page active scroll-area">
-    <div style="padding:56px 16px 16px">
-      <div class="card-hero" style="margin-bottom:16px">
-        <div class="t-meta" style="color:rgba(255,255,255,.65);margin-bottom:6px">Congresso Vicenza 2026</div>
-        <div class="t-hero" style="color:#fff">Inventario<br>CEPC</div>
-        <div class="t-small" style="color:rgba(255,255,255,.7);margin-top:8px" id="home-subtitle">Caricamento…</div>
-      </div>
-      <div class="stats-grid" id="home-stats">
-        <div class="stat-card"><div class="stat-value" id="stat-open">–</div><div class="stat-label">Checklist aperte</div></div>
-        <div class="stat-card"><div class="stat-value" id="stat-items">–</div><div class="stat-label">Articoli inventario</div></div>
-        <div class="stat-card"><div class="stat-value" id="stat-issues">–</div><div class="stat-label">Problemi segnalati</div></div>
-        <div class="stat-card"><div class="stat-value" id="stat-closed">–</div><div class="stat-label">Checklist chiuse</div></div>
-      </div>
+  <div id="page-home" class="page active">
+    <div class="home-header">
+      <div class="t-meta" style="margin-bottom:4px">Congresso Vicenza 2026</div>
+      <div class="t-title">Inventario CEPC</div>
+      <div class="t-small t-muted" id="home-subtitle" style="margin-top:6px">–</div>
     </div>
-    <div class="section">
-      <div class="section-label">Attività recenti</div>
-      <div id="home-recent"></div>
+    <div class="scroll-area">
+      <div class="section">
+        <div class="section-label">Checklist recenti</div>
+        <div id="home-recent" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden"></div>
+      </div>
     </div>
   </div>
 
@@ -764,7 +736,7 @@
     <div class="scroll-area" id="cl-rows-area" style="padding-bottom:120px"></div>
     <!-- Bottom action bar -->
     <div id="cl-action-bar" style="position:fixed;bottom:calc(var(--nav-h) + var(--safe-bottom));left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:12px 16px;display:flex;gap:10px;z-index:20">
-      <button id="btn-cl-save" class="btn btn-secondary" style="flex:1">Salva bozza</button>
+      <button id="btn-cl-save" class="btn btn-secondary" style="flex:1">Salva</button>
       <button id="btn-cl-submit" class="btn btn-primary" style="flex:1">Invia checklist</button>
       <button id="btn-cl-close" class="btn btn-success hidden" style="flex:1">Chiudi</button>
     </div>
@@ -850,21 +822,14 @@
      MODALS
 ═══════════════════════════════════════════ -->
 
-<!-- New Checklist Modal -->
+<!-- New Checklist Modal (solo admin) -->
 <div id="modal-new-cl" class="modal-backdrop hidden">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-title">Nuova Checklist</div>
     <div class="form-group">
       <label class="form-label" for="new-cl-title">Titolo</label>
-      <input id="new-cl-title" class="form-control" type="text" placeholder="Es. Uscita materiale 15/06">
-    </div>
-    <div class="form-group">
-      <label class="form-label" for="new-cl-mode">Tipo</label>
-      <select id="new-cl-mode" class="form-control">
-        <option value="checkout">Uscita materiale</option>
-        <option value="return">Rientro materiale</option>
-      </select>
+      <input id="new-cl-title" class="form-control" type="text" placeholder="Es. Congressso Vicenza 15/06">
     </div>
     <div style="display:flex;gap:10px;margin-top:8px">
       <button id="btn-modal-new-cancel" class="btn btn-ghost" style="flex:1">Annulla</button>
@@ -873,24 +838,25 @@
   </div>
 </div>
 
-<!-- Operator Info Modal -->
-<div id="modal-operator" class="modal-backdrop hidden">
+<!-- Profilo operatore — setup prima volta -->
+<div id="modal-profile" class="modal-backdrop hidden">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
-    <div class="modal-title">Informazioni operatore</div>
+    <div class="modal-title">Il tuo profilo</div>
+    <div class="t-small t-muted" style="margin-bottom:20px">Inserisci i tuoi dati una volta sola. Verranno salvati cifrati.</div>
     <div class="form-group">
-      <label class="form-label" for="op-fullname">Nome e cognome</label>
-      <input id="op-fullname" class="form-control" type="text" placeholder="Mario Rossi">
+      <label class="form-label" for="prof-fullname">Nome e cognome</label>
+      <input id="prof-fullname" class="form-control" type="text" placeholder="Mario Rossi" autocomplete="name">
     </div>
     <div class="form-group">
-      <label class="form-label" for="op-congregation">Congregazione</label>
-      <input id="op-congregation" class="form-control" type="text" placeholder="Es. Vicenza Sud">
+      <label class="form-label" for="prof-congregation">Congregazione</label>
+      <input id="prof-congregation" class="form-control" type="text" placeholder="Es. Vicenza Sud">
     </div>
     <div class="form-group">
-      <label class="form-label" for="op-phone">Telefono</label>
-      <input id="op-phone" class="form-control" type="tel" placeholder="+39 000 000 0000">
+      <label class="form-label" for="prof-phone">Telefono</label>
+      <input id="prof-phone" class="form-control" type="tel" placeholder="+39 000 000 0000" autocomplete="tel">
     </div>
-    <button id="btn-op-confirm" class="btn btn-primary btn-block" style="margin-top:8px">Conferma</button>
+    <button id="btn-prof-save" class="btn btn-primary btn-block" style="margin-top:8px">Salva profilo</button>
   </div>
 </div>
 
@@ -914,7 +880,7 @@ const SUPABASE_ANON = 'sb_publishable_DEEZJz95_A0OJdcqOta29A_zmVBfCiJ';
 const ENCRYPT_PASS  = 'VicenzaCEPCInventarioFormia2026';
 // ═══════════════════════════════════════════════════════════════
 
-// ── Supabase client ──────────────────────────────────────────
+// ── Supabase client ─────────────────────────────────────────
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
 // ════════════════════════════════════════════════════════════
@@ -973,15 +939,15 @@ async function dec(s) {
 // APP STATE
 // ════════════════════════════════════════════════════════════
 const S = {
-  session: null,
-  role: null,               // 'operator' | 'admin'
-  currentTab: 'home',
-  currentClId: null,        // UUID checklist aperta
+  session:        null,
+  role:           null,     // 'operator' | 'admin'
+  currentTab:     'home',
+  currentClId:    null,     // UUID checklist aperta
   inventoryItems: [],       // cache globale articoli
-  checklists: [],           // cache lista checklist
-  currentClRows: [],        // righe checklist aperta (dirty state)
-  currentCl: null,          // testata checklist aperta
-  operatorInfo: null,       // {fullName, congregation, phone} della sessione corrente
+  checklists:     [],       // cache lista checklist
+  currentClRows:  [],       // righe checklist aperta (dirty state)
+  currentCl:      null,     // testata checklist aperta
+  operatorProfile: null,    // {fullName, congregation, phone} decifrato dal DB
 };
 
 // ════════════════════════════════════════════════════════════
@@ -1019,73 +985,86 @@ async function dbGetChecklistRows(clId) {
   return data;
 }
 
-async function dbCreateChecklist(title, mode, operatorEnc) {
+// operator_profiles: one row per user, encrypted personal data
+async function dbGetProfile(userId) {
+  const { data } = await sb.from('operator_profiles')
+    .select('profile_enc').eq('user_id', userId).single();
+  if (!data?.profile_enc) return null;
+  return await dec(data.profile_enc);
+}
+
+async function dbSaveProfile(userId, profile) {
+  const profile_enc = await enc(profile);
+  const { error } = await sb.from('operator_profiles').upsert(
+    { user_id: userId, profile_enc, updated_at: new Date().toISOString() },
+    { onConflict: 'user_id' }
+  );
+  if (error) throw error;
+}
+
+// Admin-only: create checklist + seed rows
+async function dbCreateChecklist(title) {
   const { data, error } = await sb.from('checklists').insert({
-    title, mode,
-    operator_enc: operatorEnc,
+    title,
     created_by: S.session.user.id,
     status: 'open'
   }).select().single();
   if (error) throw error;
 
-  // Crea una riga per ogni articolo inventario
   const rows = S.inventoryItems.map(item => ({
     checklist_id: data.id,
-    item_id: item.id,
+    item_id:      item.id,
     out_qty: 0, return_qty: 0,
     has_issue: false, check_notes: ''
   }));
   const { error: re } = await sb.from('checklist_rows').insert(rows);
   if (re) throw re;
 
-  // Journal
-  await dbJournal(data.id, 'open', 'Checklist creata', operatorEnc);
+  await dbJournal(data.id, 'open', 'Checklist creata', null);
   return data;
 }
 
-async function dbUpsertRows(clId, rows, operatorEnc) {
+// Operator saves rows; updated_by tracks who last touched this
+async function dbUpsertRows(clId, rows) {
   const upserts = rows.map(r => ({
-    id: r.id,
+    id:           r.id,
     checklist_id: clId,
-    item_id: r.item_id,
-    out_qty: r.out_qty || 0,
-    return_qty: r.return_qty || 0,
-    has_issue: r.has_issue || false,
-    check_notes: r.check_notes || '',
-    status_check: r.status_check || null,
-    status_note: r.status_note || null,
-    updated_at: new Date().toISOString()
+    item_id:      r.item_id,
+    out_qty:      r.out_qty    || 0,
+    return_qty:   r.return_qty || 0,
+    has_issue:    r.has_issue  || false,
+    check_notes:  r.check_notes || '',
+    updated_by:   S.session.user.id,
+    updated_at:   new Date().toISOString()
   }));
   const { error } = await sb.from('checklist_rows').upsert(upserts);
   if (error) throw error;
-  // Update checklist timestamp + operator
+
   const { error: ce } = await sb.from('checklists').update({
-    updated_at: new Date().toISOString(),
-    operator_enc: operatorEnc
+    updated_at: new Date().toISOString()
   }).eq('id', clId);
   if (ce) throw ce;
-  await dbJournal(clId, 'change', 'Righe aggiornate', operatorEnc);
+
+  await dbJournal(clId, 'change', 'Righe aggiornate', null);
 }
 
-async function dbSubmitChecklist(clId, operatorEnc) {
+async function dbSubmitChecklist(clId) {
   const { error } = await sb.from('checklists').update({
     submitted_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    operator_enc: operatorEnc
+    updated_at:   new Date().toISOString()
   }).eq('id', clId);
   if (error) throw error;
-  await dbJournal(clId, 'submit', 'Checklist inviata', operatorEnc);
+  await dbJournal(clId, 'submit', 'Checklist inviata', null);
 }
 
 async function dbCloseChecklist(clId) {
   const { error } = await sb.from('checklists').update({
-    status: 'closed',
-    closed_at: new Date().toISOString(),
+    status:     'closed',
+    closed_at:  new Date().toISOString(),
     updated_at: new Date().toISOString()
   }).eq('id', clId);
   if (error) throw error;
-  const opEnc = S.currentCl?.operator_enc || null;
-  await dbJournal(clId, 'close', 'Checklist chiusa dal superutente', opEnc);
+  await dbJournal(clId, 'close', 'Checklist chiusa', null);
 }
 
 async function dbJournal(clId, type, message, operatorEnc) {
@@ -1097,7 +1076,6 @@ async function dbJournal(clId, type, message, operatorEnc) {
 }
 
 async function dbGetAvailability() {
-  // Calcola: per ogni articolo, somma out_qty - return_qty delle checklist aperte
   const items = S.inventoryItems;
   const { data: cls } = await sb.from('checklists').select('id').eq('status', 'open');
   if (!cls || cls.length === 0) return items.map(i => ({ ...i, out: 0, avail: i.quantity }));
@@ -1114,7 +1092,7 @@ async function dbGetAvailability() {
   });
   return items.map(i => ({
     ...i,
-    out: out[i.id] || 0,
+    out:   out[i.id] || 0,
     avail: Math.max(0, i.quantity - (out[i.id] || 0))
   }));
 }
@@ -1141,21 +1119,21 @@ function navigate(tab) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
   const map = {
-    home: 'page-home',
+    home:       'page-home',
     checklists: 'page-checklists',
-    inventory: 'page-inventory',
-    admin: 'page-admin'
+    inventory:  'page-inventory',
+    admin:      'page-admin'
   };
   document.getElementById(map[tab])?.classList.add('active');
-  if (tab === 'home') renderHome();
+  if (tab === 'home')       renderHome();
   if (tab === 'checklists') renderChecklists();
-  if (tab === 'inventory') renderInventory();
-  if (tab === 'admin') renderAdmin();
+  if (tab === 'inventory')  renderInventory();
+  if (tab === 'admin')      renderAdmin();
 }
 
 function openClDetail(clId) {
   S.currentClId = clId;
-  S.currentTab = 'cl-detail';
+  S.currentTab  = 'cl-detail';
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-cl-detail').classList.add('active');
   renderClDetail();
@@ -1163,8 +1141,7 @@ function openClDetail(clId) {
 
 function fmtDate(iso) {
   if (!iso) return '–';
-  const d = new Date(iso);
-  return d.toLocaleDateString('it-IT', { day:'2-digit', month:'short', year:'2-digit' });
+  return new Date(iso).toLocaleDateString('it-IT', { day:'2-digit', month:'short', year:'2-digit' });
 }
 
 function fmtDateTime(iso) {
@@ -1175,20 +1152,22 @@ function fmtDateTime(iso) {
 }
 
 function statusBadge(cl) {
-  if (cl.status === 'closed')     return '<span class="badge badge-closed">Chiusa</span>';
-  if (cl.submitted_at)            return '<span class="badge badge-submit">Inviata</span>';
+  if (cl.status === 'closed') return '<span class="badge badge-closed">Chiusa</span>';
+  if (cl.submitted_at)        return '<span class="badge badge-submit">Inviata</span>';
   return '<span class="badge badge-open">Aperta</span>';
 }
 
-function modeLabel(mode) {
-  return mode === 'return' ? 'Rientro' : 'Uscita';
-}
-
-// Section color map
 const SEC_COLORS = [
-  '#6366F1','#8B5CF6','#EC4899','#EF4444',
-  '#F59E0B','#10B981','#06B6D4','#3B82F6',
-  '#84CC16','#F97316'
+  'oklch(38% 0.13 155)',   // forest green  (primary)
+  'oklch(48% 0.18 200)',   // teal
+  'oklch(55% 0.22 25)',    // warm red
+  'oklch(64% 0.22 55)',    // amber
+  'oklch(52% 0.18 260)',   // slate blue
+  'oklch(55% 0.20 310)',   // plum
+  'oklch(60% 0.20 170)',   // seafoam
+  'oklch(50% 0.22 35)',    // terracotta
+  'oklch(55% 0.18 140)',   // olive
+  'oklch(58% 0.20 240)',   // cornflower
 ];
 const _secColorCache = {};
 function sectionColor(section) {
@@ -1204,7 +1183,6 @@ function parseSection(desc) {
   return m ? m[1].trim() : desc;
 }
 
-// Group items by section
 function groupBySection(items) {
   const groups = {};
   items.forEach(item => {
@@ -1213,6 +1191,15 @@ function groupBySection(items) {
     groups[sec].push(item);
   });
   return groups;
+}
+
+function itemName(description) {
+  const m = description.match(/^[^-]+-\s*(.+)/);
+  return m ? m[1].trim() : description;
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 // ════════════════════════════════════════════════════════════
@@ -1229,33 +1216,29 @@ async function renderHome() {
     S.checklists = cls;
 
     const open   = cls.filter(c => c.status === 'open').length;
-    const closed = cls.filter(c => c.status === 'closed').length;
-    const issues = cls.reduce((n, c) => n, 0); // placeholder
 
-    document.getElementById('stat-open').textContent   = open;
-    document.getElementById('stat-items').textContent  = items.length;
-    document.getElementById('stat-issues').textContent = '–';
-    document.getElementById('stat-closed').textContent = closed;
     document.getElementById('home-subtitle').textContent =
-      `${items.length} articoli · ${open} checklist aperte`;
+      open === 0
+        ? `${items.length} articoli · nessuna checklist aperta`
+        : `${items.length} articoli · ${open} checklist ${open === 1 ? 'aperta' : 'aperte'}`;
 
-    const recent = cls.slice(0, 4);
+    const recent = cls.slice(0, 5);
     const el = document.getElementById('home-recent');
     if (!recent.length) {
-      el.innerHTML = '<div class="card t-muted t-small" style="text-align:center;padding:24px">Nessuna checklist ancora.</div>';
+      el.innerHTML = `<div class="empty-state" style="padding:32px 24px">
+        <div class="t-small t-muted">Nessuna checklist ancora.</div>
+      </div>`;
     } else {
       el.innerHTML = recent.map(c => `
-        <div class="card card-tap" style="margin-bottom:10px;cursor:pointer" data-cl="${c.id}">
-          <div style="display:flex;align-items:flex-start;gap:10px">
-            <div style="flex:1;min-width:0">
-              <div class="t-h3" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.title)}</div>
-              <div class="t-meta" style="margin-top:3px">${modeLabel(c.mode)} · ${fmtDate(c.created_at)}</div>
-            </div>
-            ${statusBadge(c)}
+        <div class="list-row card-tap" style="cursor:pointer;gap:14px" data-cl="${c.id}">
+          <div style="flex:1;min-width:0">
+            <div class="t-h3" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.title)}</div>
+            <div class="t-meta" style="margin-top:2px">${fmtDate(c.created_at)}</div>
           </div>
+          ${statusBadge(c)}
         </div>`).join('');
-      el.querySelectorAll('[data-cl]').forEach(el =>
-        el.addEventListener('click', () => openClDetail(el.dataset.cl))
+      el.querySelectorAll('[data-cl]').forEach(row =>
+        row.addEventListener('click', () => openClDetail(row.dataset.cl))
       );
     }
   } finally { showLoading(false); }
@@ -1269,11 +1252,10 @@ async function renderChecklists() {
   try {
     const cls = await dbGetChecklists();
     S.checklists = cls;
-    document.getElementById('cl-count-label').textContent =
-      `${cls.length} checklist totali`;
+    document.getElementById('cl-count-label').textContent = `${cls.length} checklist totali`;
 
-    if (S.role === 'admin')
-      document.getElementById('fab-new-cl').classList.remove('hidden');
+    // FAB visible only to admin
+    document.getElementById('fab-new-cl').classList.toggle('hidden', S.role !== 'admin');
 
     const el = document.getElementById('cl-list');
     if (!cls.length) {
@@ -1288,22 +1270,23 @@ async function renderChecklists() {
       return;
     }
 
-    el.innerHTML = cls.map(c => `
-      <div class="card card-tap" style="margin-bottom:10px;cursor:pointer" data-cl="${c.id}">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
-          <div style="flex:1;min-width:0">
-            <div class="t-h3" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.title)}</div>
-            <div class="t-meta" style="margin-top:4px">
-              ${modeLabel(c.mode)} · Creata ${fmtDate(c.created_at)}
-              ${c.submitted_at ? ' · Inviata ' + fmtDate(c.submitted_at) : ''}
-            </div>
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin:0 16px';
+    wrap.innerHTML = cls.map(c => `
+      <div class="list-row card-tap" style="cursor:pointer;gap:14px" data-cl="${c.id}">
+        <div style="flex:1;min-width:0">
+          <div class="t-h3" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.title)}</div>
+          <div class="t-meta" style="margin-top:2px">
+            ${fmtDate(c.created_at)}${c.submitted_at ? ' · inviata ' + fmtDate(c.submitted_at) : ''}
           </div>
-          ${statusBadge(c)}
         </div>
+        ${statusBadge(c)}
       </div>`).join('');
+    el.innerHTML = '';
+    el.appendChild(wrap);
 
-    el.querySelectorAll('[data-cl]').forEach(card =>
-      card.addEventListener('click', () => openClDetail(card.dataset.cl))
+    wrap.querySelectorAll('[data-cl]').forEach(row =>
+      row.addEventListener('click', () => openClDetail(row.dataset.cl))
     );
   } finally { showLoading(false); }
 }
@@ -1320,10 +1303,8 @@ async function renderClDetail() {
     ]);
     S.currentCl = cl;
 
-    // Build dirty state map: item_id → row (with local edits)
     const rowMap = {};
     dbRows.forEach(r => { rowMap[r.item_id] = { ...r }; });
-    // Initialize missing items
     S.inventoryItems.forEach(item => {
       if (!rowMap[item.id]) rowMap[item.id] = {
         id: null, checklist_id: cl.id, item_id: item.id,
@@ -1332,27 +1313,25 @@ async function renderClDetail() {
     });
     S.currentClRows = Object.values(rowMap);
 
-    // Header
     document.getElementById('cl-detail-title').textContent = cl.title;
-    document.getElementById('cl-detail-badge').innerHTML =
-      `${statusBadge(cl)} <span class="badge badge-neutral" style="margin-left:4px">${modeLabel(cl.mode)}</span>`;
+    document.getElementById('cl-detail-badge').innerHTML   = statusBadge(cl);
 
-    // Operator info
+    // Operator bar: show current user's profile (operator) or "–" (admin view)
     const opBar = document.getElementById('cl-operator-text');
-    if (cl.operator_enc) {
-      const op = await dec(cl.operator_enc);
-      if (op) opBar.textContent = `${op.fullName} · ${op.congregation} · ${op.phone}`;
-      else opBar.textContent = '(dati operatore cifrati)';
+    if (S.role === 'operator' && S.operatorProfile) {
+      const p = S.operatorProfile;
+      opBar.textContent = `${p.fullName} · ${p.congregation}${p.phone ? ' · ' + p.phone : ''}`;
     } else {
-      opBar.textContent = 'Operatore non specificato';
+      opBar.textContent = '–';
     }
 
-    // Buttons
     const isClosed = cl.status === 'closed';
     const isAdmin  = S.role === 'admin';
-    document.getElementById('btn-cl-save').classList.toggle('hidden', isClosed);
-    document.getElementById('btn-cl-submit').classList.toggle('hidden', isClosed || !!cl.submitted_at);
-    document.getElementById('btn-cl-close').classList.toggle('hidden', !isAdmin || isClosed);
+
+    // Operator: Save + Submit visible when open; admin: Close + Export only
+    document.getElementById('btn-cl-save').classList.toggle('hidden',   isAdmin || isClosed);
+    document.getElementById('btn-cl-submit').classList.toggle('hidden', isAdmin || isClosed || !!cl.submitted_at);
+    document.getElementById('btn-cl-close').classList.toggle('hidden',  !isAdmin || isClosed);
     document.getElementById('btn-cl-export').classList.toggle('hidden', !isAdmin);
 
     buildClRows('');
@@ -1360,13 +1339,12 @@ async function renderClDetail() {
 }
 
 function buildClRows(filter) {
-  const area = document.getElementById('cl-rows-area');
-  const cl   = S.currentCl;
+  const area     = document.getElementById('cl-rows-area');
+  const cl       = S.currentCl;
   const isClosed = cl.status === 'closed';
-  const isReturn = cl.mode === 'return';
+  const isAdmin  = S.role === 'admin';
   const f = filter.toLowerCase().trim();
 
-  // Map item details
   const itemMap = {};
   S.inventoryItems.forEach(i => { itemMap[i.id] = i; });
 
@@ -1377,7 +1355,6 @@ function buildClRows(filter) {
     return true;
   });
 
-  // Group by section
   const groups = {};
   filtered.forEach(r => {
     const item = itemMap[r.item_id];
@@ -1390,6 +1367,9 @@ function buildClRows(filter) {
     area.innerHTML = '<div class="empty-state"><div class="t-small t-muted">Nessun articolo trovato.</div></div>';
     return;
   }
+
+  // Readonly for admin (they never fill rows) or when checklist is closed
+  const readonly = isAdmin || isClosed;
 
   let html = '';
   Object.entries(groups).forEach(([sec, entries]) => {
@@ -1406,28 +1386,28 @@ function buildClRows(filter) {
         <div class="cl-row-name">${esc(itemName(item.description))}</div>
         <div class="cl-row-meta">Max: ${item.quantity}${item.notes ? ' · ' + esc(item.notes.substring(0,60)) : ''}</div>
         <div class="cl-qty-cols">
-          ${!isReturn ? `<div>
+          <div>
             <div class="cl-qty-label">Uscita</div>
             <div class="qty-row">
-              <button class="qty-btn" data-action="dec" data-field="out_qty" data-item="${item.id}" ${isClosed?'disabled':''}>−</button>
+              <button class="qty-btn" data-action="dec" data-field="out_qty" data-item="${item.id}" ${readonly?'disabled':''}>−</button>
               <input class="qty-input" type="number" min="0" max="${item.quantity}"
                      value="${row.out_qty || 0}" data-field="out_qty" data-item="${item.id}"
-                     ${isClosed?'readonly':''}>
-              <button class="qty-btn" data-action="inc" data-field="out_qty" data-item="${item.id}" ${isClosed?'disabled':''}>+</button>
+                     ${readonly?'readonly':''}>
+              <button class="qty-btn" data-action="inc" data-field="out_qty" data-item="${item.id}" ${readonly?'disabled':''}>+</button>
             </div>
-          </div>` : ''}
-          ${isReturn || true ? `<div>
+          </div>
+          <div>
             <div class="cl-qty-label">Rientro</div>
             <div class="qty-row">
-              <button class="qty-btn" data-action="dec" data-field="return_qty" data-item="${item.id}" ${isClosed?'disabled':''}>−</button>
+              <button class="qty-btn" data-action="dec" data-field="return_qty" data-item="${item.id}" ${readonly?'disabled':''}>−</button>
               <input class="qty-input" type="number" min="0" max="${item.quantity}"
                      value="${row.return_qty || 0}" data-field="return_qty" data-item="${item.id}"
-                     ${isClosed?'readonly':''}>
-              <button class="qty-btn" data-action="inc" data-field="return_qty" data-item="${item.id}" ${isClosed?'disabled':''}>+</button>
+                     ${readonly?'readonly':''}>
+              <button class="qty-btn" data-action="inc" data-field="return_qty" data-item="${item.id}" ${readonly?'disabled':''}>+</button>
             </div>
-          </div>` : ''}
+          </div>
         </div>
-        ${!isClosed ? `<div style="margin-top:10px;display:flex;align-items:center;gap:10px">
+        ${!readonly ? `<div style="margin-top:10px;display:flex;align-items:center;gap:10px">
           <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--warning)">
             <input type="checkbox" data-field="has_issue" data-item="${item.id}"
                    ${row.has_issue ? 'checked' : ''}>
@@ -1447,7 +1427,8 @@ function buildClRows(filter) {
 
   area.innerHTML = html;
 
-  // Wire events
+  if (readonly) return;
+
   area.querySelectorAll('.qty-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const { action, field, item: itemId } = btn.dataset;
@@ -1459,7 +1440,6 @@ function buildClRows(filter) {
       row[field] = val;
       const input = area.querySelector(`input[data-field="${field}"][data-item="${itemId}"]`);
       if (input) input.value = val;
-      // visual feedback
       const card = btn.closest('.cl-row');
       if (card) card.classList.toggle('has-changes', val > 0 || row.has_issue);
     });
@@ -1486,16 +1466,6 @@ function buildClRows(filter) {
   });
 }
 
-function itemName(description) {
-  // Remove section prefix
-  const m = description.match(/^[^-]+-\s*(.+)/);
-  return m ? m[1].trim() : description;
-}
-
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
 // ════════════════════════════════════════════════════════════
 // RENDER — INVENTORY
 // ════════════════════════════════════════════════════════════
@@ -1503,8 +1473,7 @@ async function renderInventory() {
   showLoading(true);
   try {
     if (!S.inventoryItems.length) S.inventoryItems = await dbGetInventory();
-    const items = S.inventoryItems;
-    document.getElementById('inv-count-label').textContent = `${items.length} articoli`;
+    document.getElementById('inv-count-label').textContent = `${S.inventoryItems.length} articoli`;
     buildInvList('');
   } finally { showLoading(false); }
 }
@@ -1556,7 +1525,6 @@ async function renderAdmin() {
       dbGetChecklists()
     ]);
 
-    // Availability table (only items with out > 0)
     const withOut = avail.filter(a => a.out > 0);
     const availEl = document.getElementById('admin-avail');
     if (!withOut.length) {
@@ -1578,30 +1546,26 @@ async function renderAdmin() {
           </div>`).join('')}`;
     }
 
-    // Checklist admin list
     const clEl = document.getElementById('admin-cl-list');
     if (!cls.length) {
       clEl.innerHTML = '<div class="card t-muted t-small" style="text-align:center;padding:20px">Nessuna checklist.</div>';
     } else {
-      clEl.innerHTML = cls.map(c => `
-        <div class="card" style="margin-bottom:10px">
-          <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:12px">
+      clEl.innerHTML = `<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">` +
+        cls.map(c => `
+        <div class="list-row" style="flex-direction:column;align-items:stretch;gap:10px">
+          <div style="display:flex;align-items:center;gap:12px">
             <div style="flex:1;min-width:0">
               <div class="t-h3" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.title)}</div>
-              <div class="t-meta" style="margin-top:3px">${modeLabel(c.mode)} · ${fmtDateTime(c.created_at)}</div>
+              <div class="t-meta" style="margin-top:2px">${fmtDateTime(c.created_at)}</div>
             </div>
             ${statusBadge(c)}
           </div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn btn-sm btn-secondary" data-action="open-cl" data-id="${c.id}">
-              Apri
-            </button>
-            <button class="btn btn-sm btn-secondary" data-action="export-cl" data-id="${c.id}">
-              Export .xlsx
-            </button>
-            ${c.status !== 'closed' ? `<button class="btn btn-sm btn-success" data-action="close-cl" data-id="${c.id}">Chiudi</button>` : ''}
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-sm btn-secondary" data-action="open-cl" data-id="${c.id}">Apri</button>
+            <button class="btn btn-sm btn-secondary" data-action="export-cl" data-id="${c.id}">.xlsx</button>
+            ${c.status !== 'closed' ? `<button class="btn btn-sm btn-primary" data-action="close-cl" data-id="${c.id}">Chiudi</button>` : ''}
           </div>
-        </div>`).join('');
+        </div>`).join('') + `</div>`;
 
       clEl.querySelectorAll('[data-action]').forEach(btn => {
         btn.addEventListener('click', async () => {
@@ -1611,15 +1575,15 @@ async function renderAdmin() {
             showLoading(true);
             try {
               S.currentClId = id;
-              S.currentCl = await dbGetChecklist(id);
+              S.currentCl   = await dbGetChecklist(id);
               await dbCloseChecklist(id);
               showToast('Checklist chiusa.', 'success');
               await renderAdmin();
             } catch(e) { showToast(e.message, 'error'); showLoading(false); }
           }
           if (action === 'export-cl') {
-            S.currentClId = id;
-            S.currentCl = await dbGetChecklist(id);
+            S.currentClId   = id;
+            S.currentCl     = await dbGetChecklist(id);
             S.currentClRows = await dbGetChecklistRows(id);
             exportXlsx();
           }
@@ -1640,19 +1604,10 @@ async function exportXlsx() {
     const itemMap = {};
     S.inventoryItems.forEach(i => { itemMap[i.id] = i; });
 
-    // Decrypt operator info
-    let opLabel = 'Operatore sconosciuto';
-    if (cl.operator_enc) {
-      const op = await dec(cl.operator_enc);
-      if (op) opLabel = `${op.fullName} - ${op.congregation} - ${op.phone}`;
-    }
-
     const rows = S.currentClRows;
     const data = [
       ['CEPC Inventario Vicenza'],
       [`Checklist: ${cl.title}`],
-      [`Tipo: ${modeLabel(cl.mode)}`],
-      [`Operatore: ${opLabel}`],
       [`Creata: ${fmtDateTime(cl.created_at)}`],
       [],
       ['Sezione','Articolo','Qta Tot.','Uscita','Rientro','Differenza','Problema','Note'],
@@ -1674,15 +1629,10 @@ async function exportXlsx() {
     });
 
     const ws = XLSX.utils.aoa_to_sheet(data);
+    ws['!cols'] = [{wch:18},{wch:40},{wch:8},{wch:8},{wch:8},{wch:10},{wch:10},{wch:30}];
 
-    // Column widths
-    ws['!cols'] = [
-      {wch:18},{wch:40},{wch:8},{wch:8},{wch:8},{wch:10},{wch:10},{wch:30}
-    ];
-
-    // Highlight issue rows (orange bg)
-    const headerRow = 7; // 1-indexed row where data starts
-    data.slice(7).forEach((row, i) => {
+    const headerRow = 5;
+    data.slice(5).forEach((row, i) => {
       if (row[6] === 'SI') {
         const excelRow = headerRow + i + 1;
         for (let c = 0; c < 8; c++) {
@@ -1697,8 +1647,7 @@ async function exportXlsx() {
     XLSX.utils.book_append_sheet(wb, ws, 'Checklist');
 
     const stamp = new Date().toISOString().replace(/[-:T]/g,'').substring(0,12);
-    const mode  = cl.mode === 'return' ? 'rientro' : 'uscita';
-    XLSX.writeFile(wb, `inventario-vicenza-${mode}-${stamp}.xlsx`);
+    XLSX.writeFile(wb, `inventario-vicenza-${stamp}.xlsx`);
     showToast('File scaricato.', 'success');
   } catch(e) {
     showToast('Errore export: ' + e.message, 'error');
@@ -1706,25 +1655,31 @@ async function exportXlsx() {
 }
 
 // ════════════════════════════════════════════════════════════
-// OPERATOR INFO — save / ask
+// PROFILE MODAL — one-time setup for operators
 // ════════════════════════════════════════════════════════════
-function askOperatorInfo(cb) {
-  const modal = document.getElementById('modal-operator');
+function showProfileModal(onSaved) {
+  const modal = document.getElementById('modal-profile');
   modal.classList.remove('hidden');
-  // Pre-fill if already have info in session
-  if (S.operatorInfo) {
-    document.getElementById('op-fullname').value     = S.operatorInfo.fullName || '';
-    document.getElementById('op-congregation').value = S.operatorInfo.congregation || '';
-    document.getElementById('op-phone').value        = S.operatorInfo.phone || '';
+  if (S.operatorProfile) {
+    document.getElementById('prof-fullname').value     = S.operatorProfile.fullName     || '';
+    document.getElementById('prof-congregation').value = S.operatorProfile.congregation || '';
+    document.getElementById('prof-phone').value        = S.operatorProfile.phone        || '';
   }
-  document.getElementById('btn-op-confirm').onclick = () => {
-    const fn = document.getElementById('op-fullname').value.trim();
-    const cg = document.getElementById('op-congregation').value.trim();
-    const ph = document.getElementById('op-phone').value.trim();
+  document.getElementById('btn-prof-save').onclick = async () => {
+    const fn = document.getElementById('prof-fullname').value.trim();
+    const cg = document.getElementById('prof-congregation').value.trim();
+    const ph = document.getElementById('prof-phone').value.trim();
     if (!fn) { showToast('Inserisci nome e cognome.', 'error'); return; }
-    S.operatorInfo = { fullName: fn, congregation: cg, phone: ph };
-    modal.classList.add('hidden');
-    cb(S.operatorInfo);
+    showLoading(true);
+    try {
+      const profile = { fullName: fn, congregation: cg, phone: ph };
+      await dbSaveProfile(S.session.user.id, profile);
+      S.operatorProfile = profile;
+      modal.classList.add('hidden');
+      if (onSaved) onSaved();
+    } catch(e) {
+      showToast('Errore salvataggio profilo: ' + e.message, 'error');
+    } finally { showLoading(false); }
   };
 }
 
@@ -1732,84 +1687,65 @@ function askOperatorInfo(cb) {
 // EVENT WIRING
 // ════════════════════════════════════════════════════════════
 function wireEvents() {
-  // Bottom nav
   document.querySelectorAll('.nav-tab[data-tab]').forEach(tab =>
     tab.addEventListener('click', () => navigate(tab.dataset.tab))
   );
 
-  // Login
   document.getElementById('btn-login').addEventListener('click', handleLogin);
   document.getElementById('inp-pass').addEventListener('keydown', e => {
     if (e.key === 'Enter') handleLogin();
   });
 
-  // Back from detail
   document.getElementById('cl-detail-back').addEventListener('click', () => {
     S.currentClId = null;
     navigate('checklists');
   });
 
-  // FAB new checklist
   document.getElementById('fab-new-cl').addEventListener('click', () =>
     document.getElementById('modal-new-cl').classList.remove('hidden')
   );
 
-  // Modal new cl - cancel
   document.getElementById('btn-modal-new-cancel').addEventListener('click', () =>
     document.getElementById('modal-new-cl').classList.add('hidden')
   );
 
-  // Modal new cl - confirm
   document.getElementById('btn-modal-new-confirm').addEventListener('click', async () => {
     const title = document.getElementById('new-cl-title').value.trim();
-    const mode  = document.getElementById('new-cl-mode').value;
     if (!title) { showToast('Inserisci un titolo.', 'error'); return; }
     document.getElementById('modal-new-cl').classList.add('hidden');
-
-    askOperatorInfo(async (op) => {
-      showLoading(true);
-      try {
-        const opEnc = await enc(op);
-        const cl = await dbCreateChecklist(title, mode, opEnc);
-        document.getElementById('new-cl-title').value = '';
-        showToast('Checklist creata!', 'success');
-        openClDetail(cl.id);
-      } catch(e) { showToast(e.message, 'error'); }
-      finally { showLoading(false); }
-    });
+    showLoading(true);
+    try {
+      const cl = await dbCreateChecklist(title);
+      document.getElementById('new-cl-title').value = '';
+      showToast('Checklist creata!', 'success');
+      openClDetail(cl.id);
+    } catch(e) { showToast(e.message, 'error'); }
+    finally { showLoading(false); }
   });
 
-  // Checklist detail actions
+  // Save rows (operator only)
   document.getElementById('btn-cl-save').addEventListener('click', async () => {
-    const action = async (op) => {
-      showLoading(true);
-      try {
-        const opEnc = await enc(op);
-        await dbUpsertRows(S.currentClId, S.currentClRows, opEnc);
-        showToast('Salvato!', 'success');
-      } catch(e) { showToast(e.message, 'error'); }
-      finally { showLoading(false); }
-    };
-    if (S.operatorInfo) action(S.operatorInfo);
-    else askOperatorInfo(action);
+    showLoading(true);
+    try {
+      await dbUpsertRows(S.currentClId, S.currentClRows);
+      showToast('Salvato!', 'success');
+    } catch(e) { showToast(e.message, 'error'); }
+    finally { showLoading(false); }
   });
 
+  // Submit checklist (operator only)
   document.getElementById('btn-cl-submit').addEventListener('click', async () => {
-    const action = async (op) => {
-      showLoading(true);
-      try {
-        const opEnc = await enc(op);
-        await dbUpsertRows(S.currentClId, S.currentClRows, opEnc);
-        await dbSubmitChecklist(S.currentClId, opEnc);
-        showToast('Checklist inviata!', 'success');
-        await renderClDetail();
-      } catch(e) { showToast(e.message, 'error'); }
-      finally { showLoading(false); }
-    };
-    if (S.operatorInfo) action(S.operatorInfo);
-    else askOperatorInfo(action);
+    showLoading(true);
+    try {
+      await dbUpsertRows(S.currentClId, S.currentClRows);
+      await dbSubmitChecklist(S.currentClId);
+      showToast('Checklist inviata!', 'success');
+      await renderClDetail();
+    } catch(e) { showToast(e.message, 'error'); }
+    finally { showLoading(false); }
   });
 
+  // Close checklist (admin only)
   document.getElementById('btn-cl-close').addEventListener('click', async () => {
     showLoading(true);
     try {
@@ -1822,7 +1758,6 @@ function wireEvents() {
 
   document.getElementById('btn-cl-export').addEventListener('click', exportXlsx);
 
-  // Search bars
   let invTimer, clTimer;
   document.getElementById('inv-search').addEventListener('input', e => {
     clearTimeout(invTimer);
@@ -1833,14 +1768,12 @@ function wireEvents() {
     clTimer = setTimeout(() => buildClRows(e.target.value), 200);
   });
 
-  // Close modals on backdrop click
-  document.getElementById('modal-new-cl').addEventListener('click', e => {
-    if (e.target === e.currentTarget)
-      document.getElementById('modal-new-cl').classList.add('hidden');
-  });
-  document.getElementById('modal-operator').addEventListener('click', e => {
-    if (e.target === e.currentTarget)
-      document.getElementById('modal-operator').classList.add('hidden');
+  // Backdrop click closes modals
+  ['modal-new-cl', 'modal-profile'].forEach(id => {
+    document.getElementById(id).addEventListener('click', e => {
+      if (e.target === e.currentTarget)
+        document.getElementById(id).classList.add('hidden');
+    });
   });
 }
 
@@ -1873,17 +1806,24 @@ async function handleLogin() {
 }
 
 async function onLoginSuccess() {
-  // Show app, hide login
   document.getElementById('page-login').classList.add('hidden');
   document.getElementById('app-shell').classList.remove('hidden');
 
-  // Show admin tab if admin
   if (S.role === 'admin') {
     document.getElementById('nav-admin-tab').classList.remove('hidden');
   }
 
-  // Prefetch inventory
   S.inventoryItems = await dbGetInventory();
+
+  // Operators must have a profile; show setup modal if missing
+  if (S.role === 'operator') {
+    S.operatorProfile = await dbGetProfile(S.session.user.id);
+    if (!S.operatorProfile) {
+      navigate('home');
+      showProfileModal(null);
+      return;
+    }
+  }
 
   navigate('home');
 }
@@ -1894,7 +1834,6 @@ async function onLoginSuccess() {
 async function init() {
   wireEvents();
 
-  // Check existing session
   const { data: { session } } = await sb.auth.getSession();
   if (session) {
     S.session = session;
@@ -1903,11 +1842,11 @@ async function init() {
     await onLoginSuccess();
   }
 
-  // Auth state changes (logout from another tab, etc.)
   sb.auth.onAuthStateChange((event, session) => {
     if (event === 'SIGNED_OUT') {
       S.session = null;
       S.role    = null;
+      S.operatorProfile = null;
       document.getElementById('app-shell').classList.add('hidden');
       document.getElementById('page-login').classList.remove('hidden');
     }
