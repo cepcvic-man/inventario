@@ -733,6 +733,11 @@
         <input id="cl-search" class="search-input" type="search" placeholder="Cerca articolo…">
       </div>
     </div>
+    <!-- Phase selector -->
+    <div id="cl-phase-bar" style="display:flex;padding:8px 16px;gap:8px;background:var(--surface);border-bottom:1px solid var(--border)">
+      <button id="btn-phase-out" class="btn btn-primary" style="flex:1;font-weight:600" onclick="setClPhase('out')">Uscita</button>
+      <button id="btn-phase-return" class="btn btn-secondary" style="flex:1" onclick="setClPhase('return')">Rientro</button>
+    </div>
     <div class="scroll-area" id="cl-rows-area" style="padding-bottom:120px"></div>
     <!-- Bottom action bar -->
     <div id="cl-action-bar" style="position:fixed;bottom:calc(var(--nav-h) + var(--safe-bottom));left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:12px 16px;display:flex;gap:10px;z-index:20">
@@ -948,6 +953,7 @@ const S = {
   currentClRows:  [],       // righe checklist aperta (dirty state)
   currentCl:      null,     // testata checklist aperta
   operatorProfile: null,    // {fullName, congregation, phone} decifrato dal DB
+  clPhase:         'out',   // 'out' | 'return'
 };
 
 // ════════════════════════════════════════════════════════════
@@ -1134,9 +1140,29 @@ function navigate(tab) {
 function openClDetail(clId) {
   S.currentClId = clId;
   S.currentTab  = 'cl-detail';
+  S.clPhase     = 'out';
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-cl-detail').classList.add('active');
   renderClDetail();
+}
+
+function setClPhase(phase) {
+  S.clPhase = phase;
+  const btnOut    = document.getElementById('btn-phase-out');
+  const btnReturn = document.getElementById('btn-phase-return');
+  if (phase === 'out') {
+    btnOut.className    = 'btn btn-primary';
+    btnOut.style.fontWeight = '600';
+    btnReturn.className = 'btn btn-secondary';
+    btnReturn.style.fontWeight = '';
+  } else {
+    btnReturn.className = 'btn btn-primary';
+    btnReturn.style.fontWeight = '600';
+    btnOut.className    = 'btn btn-secondary';
+    btnOut.style.fontWeight = '';
+  }
+  const searchVal = document.getElementById('cl-search')?.value || '';
+  buildClRows(searchVal);
 }
 
 function fmtDate(iso) {
@@ -1344,6 +1370,7 @@ function buildClRows(filter) {
   const isClosed = cl.status === 'closed';
   const isAdmin  = S.role === 'admin';
   const f = filter.toLowerCase().trim();
+  const phase = S.clPhase; // 'out' | 'return'
 
   const itemMap = {};
   S.inventoryItems.forEach(i => { itemMap[i.id] = i; });
@@ -1352,6 +1379,8 @@ function buildClRows(filter) {
     const item = itemMap[r.item_id];
     if (!item) return false;
     if (f && !item.description.toLowerCase().includes(f)) return false;
+    // Per rientro: mostra solo righe con uscite effettive
+    if (phase === 'return' && !(r.out_qty > 0)) return false;
     return true;
   });
 
@@ -1386,6 +1415,7 @@ function buildClRows(filter) {
         <div class="cl-row-name">${esc(itemName(item.description))}</div>
         <div class="cl-row-meta">Max: ${item.quantity}${item.notes ? ' · ' + esc(item.notes.substring(0,60)) : ''}</div>
         <div class="cl-qty-cols">
+          ${phase === 'out' ? `
           <div>
             <div class="cl-qty-label">Uscita</div>
             <div class="qty-row">
@@ -1395,17 +1425,20 @@ function buildClRows(filter) {
                      ${readonly?'readonly':''}>
               <button class="qty-btn" data-action="inc" data-field="out_qty" data-item="${item.id}" ${readonly?'disabled':''}>+</button>
             </div>
-          </div>
+          </div>` : `
           <div>
-            <div class="cl-qty-label">Rientro</div>
+            <div class="cl-qty-label" style="display:flex;align-items:center;gap:6px">
+              Rientro
+              <span class="t-meta" style="font-size:11px">(usciti: ${row.out_qty || 0})</span>
+            </div>
             <div class="qty-row">
               <button class="qty-btn" data-action="dec" data-field="return_qty" data-item="${item.id}" ${readonly?'disabled':''}>−</button>
-              <input class="qty-input" type="number" min="0" max="${item.quantity}"
+              <input class="qty-input" type="number" min="0" max="${row.out_qty || 0}"
                      value="${row.return_qty || 0}" data-field="return_qty" data-item="${item.id}"
                      ${readonly?'readonly':''}>
               <button class="qty-btn" data-action="inc" data-field="return_qty" data-item="${item.id}" ${readonly?'disabled':''}>+</button>
             </div>
-          </div>
+          </div>`}
         </div>
         ${!readonly ? `<div style="margin-top:10px;display:flex;align-items:center;gap:10px">
           <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--warning)">
