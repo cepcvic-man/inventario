@@ -344,6 +344,30 @@
     .btn:disabled  { opacity: .45; pointer-events: none; }
 
     /* FAB */
+    /* ── Toggle switch ─────────────────────── */
+    .toggle-track {
+      width: 42px; height: 24px;
+      background: var(--border);
+      border-radius: 12px;
+      position: relative;
+      transition: background .2s;
+      cursor: pointer;
+    }
+    .toggle-track.on { background: var(--primary); }
+    .toggle-thumb {
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform .2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,.2);
+    }
+    .toggle-track.on .toggle-thumb { transform: translateX(18px); }
+
+    /* ── Check funzionamento modal ─────────── */
+    .check-radio-label { transition: background .15s, color .15s, border-color .15s; }
+
     .fab {
       position: fixed;
       bottom: calc(var(--nav-h) + var(--safe-bottom) + 16px);
@@ -784,6 +808,12 @@
         <div class="section-label">Gestione checklist</div>
         <div id="admin-cl-list"></div>
       </div>
+      <!-- Configurazione articoli -->
+      <div class="section">
+        <div class="section-label">Check funzionamento richiesto</div>
+        <div class="t-small t-muted" style="margin-bottom:8px">Attiva il flag per gli articoli che richiedono una verifica di funzionamento alla consegna.</div>
+        <div id="admin-items-config"></div>
+      </div>
     </div>
   </div>
 
@@ -872,6 +902,20 @@
 <!-- ═══════════════════════════════════════════
      SCRIPTS
 ═══════════════════════════════════════════ -->
+<!-- Modale verifica funzionamento -->
+<div id="modal-check-fn" class="modal-backdrop hidden">
+  <div class="modal-sheet" style="max-height:80vh;display:flex;flex-direction:column">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Verifica funzionamento</div>
+    <div class="t-small t-muted" style="margin-bottom:16px">Per ogni articolo segnalato, indica il risultato del controllo.</div>
+    <div id="check-fn-list" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:14px"></div>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button id="btn-check-fn-cancel" class="btn btn-ghost" style="flex:1">Annulla</button>
+      <button id="btn-check-fn-confirm" class="btn btn-primary" style="flex:1">Conferma e invia</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
@@ -1030,7 +1074,6 @@ async function dbCreateChecklist(title) {
   return data;
 }
 
-// Operator saves rows; updated_by tracks who last touched this
 async function dbUpsertRows(clId, rows) {
   const upserts = rows.map(r => ({
     id:           r.id,
@@ -1040,7 +1083,6 @@ async function dbUpsertRows(clId, rows) {
     return_qty:   r.return_qty || 0,
     has_issue:    r.has_issue  || false,
     check_notes:  r.check_notes || '',
-    updated_by:   S.session.user.id,
     updated_at:   new Date().toISOString()
   }));
   const { error } = await sb.from('checklist_rows').upsert(upserts);
@@ -1052,6 +1094,27 @@ async function dbUpsertRows(clId, rows) {
   if (ce) throw ce;
 
   await dbJournal(clId, 'change', 'Righe aggiornate', null);
+}
+
+async function dbSetCheckRequired(itemId, val) {
+  const { error } = await sb.from('inventory_items')
+    .update({ check_required: val, updated_at: new Date().toISOString() })
+    .eq('id', itemId);
+  if (error) throw error;
+  const item = S.inventoryItems.find(i => i.id === itemId);
+  if (item) item.check_required = val;
+}
+
+async function dbSaveChecks(clId, checks) {
+  const rows = checks.map(c => ({
+    checklist_id: clId,
+    item_id:      c.item_id,
+    result:       c.result,
+    notes:        c.notes || '',
+    created_by:   S.session.user.id
+  }));
+  const { error } = await sb.from('checklist_checks').upsert(rows, { onConflict: 'checklist_id,item_id' });
+  if (error) throw error;
 }
 
 async function dbSubmitChecklist(clId) {
@@ -1144,6 +1207,53 @@ function openClDetail(clId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-cl-detail').classList.add('active');
   renderClDetail();
+}
+
+function openCheckFnModal(rows) {
+  const list = document.getElementById('check-fn-list');
+  list.innerHTML = rows.map(r => {
+    const item = S.inventoryItems.find(i => i.id === r.item_id);
+    const name = item?.description || r.item_id;
+    return `
+    <div class="card" style="padding:14px" data-item-check="${r.item_id}">
+      <div class="t-label" style="margin-bottom:10px">${name}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${['nc','ok','ko'].map(v => `
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 12px;border:1px solid var(--border);border-radius:20px;flex:1;justify-content:center" class="check-radio-label" data-val="${v}">
+            <input type="radio" name="check-${r.item_id}" value="${v}" style="display:none" onchange="onCheckRadioChange(this)">
+            <span>${v === 'nc' ? 'NC' : v === 'ok' ? 'Funziona' : 'Non funziona'}</span>
+          </label>`).join('')}
+      </div>
+      <textarea class="check-notes-input" placeholder="Descrivi il problema..." rows="2"
+        style="display:none;width:100%;margin-top:10px;padding:8px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface-2);color:var(--text);font-size:14px;resize:vertical;box-sizing:border-box"></textarea>
+    </div>`;
+  }).join('');
+  document.getElementById('modal-check-fn').classList.remove('hidden');
+}
+
+function onCheckRadioChange(radio) {
+  const card  = radio.closest('[data-item-check]');
+  const notes = card.querySelector('.check-notes-input');
+  notes.style.display = radio.value === 'ko' ? 'block' : 'none';
+  notes.style.borderColor = '';
+  // stile visivo label selezionata
+  card.querySelectorAll('.check-radio-label').forEach(l => {
+    const active = l.dataset.val === radio.value;
+    l.style.background    = active ? 'var(--primary)' : '';
+    l.style.color         = active ? '#fff' : '';
+    l.style.borderColor   = active ? 'var(--primary)' : 'var(--border)';
+  });
+}
+
+async function doSubmitChecklist(checks) {
+  showLoading(true);
+  try {
+    if (checks?.length) await dbSaveChecks(S.currentClId, checks);
+    await dbSubmitChecklist(S.currentClId);
+    showToast('Checklist inviata!', 'success');
+    await renderClDetail();
+  } catch(e) { showToast(e.message, 'error'); }
+  finally { showLoading(false); }
 }
 
 function setClPhase(phase) {
@@ -1623,6 +1733,31 @@ async function renderAdmin() {
         });
       });
     }
+    // Sezione configurazione articoli (check_required)
+    const items = S.inventoryItems.length ? S.inventoryItems : await dbGetInventory().then(d => { S.inventoryItems = d; return d; });
+    const cfgEl = document.getElementById('admin-items-config');
+    cfgEl.innerHTML = `
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+        ${items.map(item => `
+          <div class="list-row" style="align-items:center;gap:12px;padding:12px 16px" data-item-cfg="${item.id}">
+            <div style="flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(item.description)}</div>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;flex-shrink:0">
+              <div class="toggle-track ${item.check_required ? 'on' : ''}" data-item-toggle="${item.id}">
+                <div class="toggle-thumb"></div>
+              </div>
+            </label>
+          </div>`).join('')}
+      </div>`;
+    cfgEl.querySelectorAll('[data-item-toggle]').forEach(track => {
+      track.addEventListener('click', async () => {
+        const itemId = track.dataset.itemToggle;
+        const newVal = !track.classList.contains('on');
+        track.classList.toggle('on', newVal);
+        try { await dbSetCheckRequired(itemId, newVal); }
+        catch(e) { track.classList.toggle('on', !newVal); showToast(e.message, 'error'); }
+      });
+    });
+
   } finally { showLoading(false); }
 }
 
@@ -1771,11 +1906,47 @@ function wireEvents() {
     showLoading(true);
     try {
       await dbUpsertRows(S.currentClId, S.currentClRows);
-      await dbSubmitChecklist(S.currentClId);
-      showToast('Checklist inviata!', 'success');
-      await renderClDetail();
-    } catch(e) { showToast(e.message, 'error'); }
-    finally { showLoading(false); }
+    } catch(e) { showToast(e.message, 'error'); showLoading(false); return; }
+    showLoading(false);
+
+    // Articoli usati che richiedono verifica funzionamento
+    const checkItems = S.currentClRows.filter(r => {
+      if (!(r.out_qty > 0 || r.return_qty > 0)) return false;
+      const item = S.inventoryItems.find(i => i.id === r.item_id);
+      return item?.check_required;
+    });
+
+    if (checkItems.length > 0) {
+      openCheckFnModal(checkItems);
+    } else {
+      await doSubmitChecklist();
+    }
+  });
+
+  document.getElementById('btn-check-fn-confirm').addEventListener('click', async () => {
+    const list   = document.getElementById('check-fn-list');
+    const cards  = list.querySelectorAll('[data-item-check]');
+    const checks = [];
+    let   valid  = true;
+
+    cards.forEach(card => {
+      const itemId  = card.dataset.itemCheck;
+      const chosen  = card.querySelector('input[type=radio]:checked');
+      if (!chosen) { valid = false; return; }
+      const result = chosen.value;
+      const notes  = result === 'ko' ? (card.querySelector('.check-notes-input')?.value?.trim() || '') : '';
+      if (result === 'ko' && !notes) { valid = false; card.querySelector('.check-notes-input').style.borderColor = 'var(--error)'; }
+      checks.push({ item_id: itemId, result, notes });
+    });
+
+    if (!valid) { showToast('Completa tutti i controlli e aggiungi note per gli articoli non funzionanti.', 'error'); return; }
+
+    document.getElementById('modal-check-fn').classList.add('hidden');
+    await doSubmitChecklist(checks);
+  });
+
+  document.getElementById('btn-check-fn-cancel').addEventListener('click', () => {
+    document.getElementById('modal-check-fn').classList.add('hidden');
   });
 
   // Close checklist (admin only)
