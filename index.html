@@ -287,10 +287,11 @@
       border: 1.5px solid var(--border);
       border-radius: var(--radius-sm);
       overflow: hidden;
-      height: 44px;
+      height: 40px;
+      width: 130px;
     }
     .qty-btn {
-      width: 44px; height: 44px;
+      width: 40px; height: 40px;
       flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
       color: var(--primary);
@@ -302,6 +303,7 @@
     }
     .qty-btn:active { background: var(--primary-soft); }
     .qty-input {
+      width: 50px;
       flex: 1;
       text-align: center;
       border: none;
@@ -521,16 +523,24 @@
     .cl-row {
       background: var(--surface);
       border: 1px solid var(--border);
+      border-left: 3px solid transparent;
       border-radius: var(--radius-sm);
-      padding: 14px;
-      margin: 0 16px 8px;
+      padding: 12px 14px;
+      margin: 0 12px 6px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: border-color .15s, background .15s;
     }
-    .cl-row.has-issue { border-color: var(--warning); background: var(--warning-soft); }
-    .cl-row.has-changes { border-color: var(--primary); background: var(--primary-soft); }
-    .cl-row-name { font-size: 14px; font-weight: 600; }
-    .cl-row-meta { font-size: 12px; color: var(--text-3); margin-bottom: 10px; margin-top: 2px; }
-    .cl-qty-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .cl-qty-label { font-size: 11px; font-weight: 600; color: var(--text-3); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .4px; }
+    .cl-row.has-changes {
+      border-left-color: var(--primary);
+      background: var(--primary-soft);
+    }
+    .cl-row-info { flex: 1; min-width: 0; }
+    .cl-row-name { font-size: 14px; font-weight: 600; line-height: 1.3; }
+    .cl-row-meta { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+    .cl-qty-label { font-size: 10px; font-weight: 700; color: var(--text-3); margin-bottom: 3px; text-transform: uppercase; letter-spacing: .5px; text-align: center; }
+    .cl-qty-wrap  { flex-shrink: 0; }
 
     /* Search bar */
     .search-bar {
@@ -626,15 +636,17 @@
     /* Availability table */
     .avail-row {
       display: grid;
-      grid-template-columns: 1fr auto auto auto;
-      gap: 8px;
+      grid-template-columns: 1fr 44px 52px 44px;
+      gap: 4px;
       align-items: center;
       padding: 10px 16px;
       border-bottom: 1px solid var(--border);
       font-size: 13px;
     }
+    .avail-row:not(.header) { cursor: pointer; transition: background .12s; }
+    .avail-row:not(.header):hover { background: var(--surface-2); }
     .avail-row.header {
-      font-weight: 600;
+      font-weight: 700;
       font-size: 11px;
       color: var(--text-3);
       text-transform: uppercase;
@@ -935,6 +947,19 @@
   </div>
 </div>
 
+<!-- Modale impegni articolo (admin) -->
+<div id="modal-item-eng" class="modal-backdrop hidden">
+  <div class="modal-sheet" style="max-height:75vh;display:flex;flex-direction:column">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="item-eng-title"></div>
+    <div style="display:grid;grid-template-columns:1fr 40px 40px 40px;gap:4px;padding-bottom:8px;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border)">
+      <div>Checklist</div><div style="text-align:right">Usc.</div><div style="text-align:right">Rnt.</div><div style="text-align:right">Netto</div>
+    </div>
+    <div id="item-eng-body" style="overflow-y:auto;flex:1"></div>
+    <button class="btn btn-ghost" style="margin-top:14px;width:100%" onclick="document.getElementById('modal-item-eng').classList.add('hidden')">Chiudi</button>
+  </div>
+</div>
+
 <!-- Modale edit articolo (admin) -->
 <div id="modal-edit-item" class="modal-backdrop hidden">
   <div class="modal-sheet">
@@ -1166,6 +1191,53 @@ async function dbDeleteItem(id) {
   const { error } = await sb.from('inventory_items').delete().eq('id', id);
   if (error) throw error;
   S.inventoryItems = S.inventoryItems.filter(i => i.id !== id);
+}
+
+async function dbGetItemEngagements(itemId) {
+  const { data: rows, error } = await sb
+    .from('checklist_rows')
+    .select('checklist_id, out_qty, return_qty, checklists(id, title, status, created_at)')
+    .eq('item_id', itemId)
+    .gt('out_qty', 0);
+  if (error) throw error;
+  return (rows || [])
+    .filter(r => r.checklists?.status === 'open')
+    .map(r => ({
+      cl_id:      r.checklists.id,
+      cl_title:   r.checklists.title,
+      cl_date:    r.checklists.created_at,
+      out_qty:    r.out_qty,
+      return_qty: r.return_qty || 0,
+      net:        r.out_qty - (r.return_qty || 0)
+    }));
+}
+
+async function openItemEngagementsModal(itemId, itemName) {
+  const modal = document.getElementById('modal-item-eng');
+  const body  = document.getElementById('item-eng-body');
+  document.getElementById('item-eng-title').textContent = itemName;
+  body.innerHTML = '<div class="t-muted t-small" style="text-align:center;padding:20px">Caricamento…</div>';
+  modal.classList.remove('hidden');
+  try {
+    const engs = await dbGetItemEngagements(itemId);
+    if (!engs.length) {
+      body.innerHTML = '<div class="t-muted t-small" style="text-align:center;padding:20px">Nessun impegno attivo.</div>';
+      return;
+    }
+    body.innerHTML = engs.map(e => `
+      <div style="display:grid;grid-template-columns:1fr 40px 40px 40px;gap:4px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px">
+        <div>
+          <div style="font-weight:600">${esc(e.cl_title)}</div>
+          <div class="t-meta">${new Date(e.cl_date).toLocaleDateString('it-IT')}</div>
+        </div>
+        <div style="text-align:right;font-variant-numeric:tabular-nums">${e.out_qty}</div>
+        <div style="text-align:right;font-variant-numeric:tabular-nums;color:var(--success)">${e.return_qty}</div>
+        <div style="text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:${e.net > 0 ? 'var(--primary)' : 'var(--text)'}">${e.net}</div>
+      </div>`).join('') +
+      `<div style="display:grid;grid-template-columns:1fr 40px 40px 40px;gap:4px;padding-top:8px;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.4px">
+        <div></div><div style="text-align:right">Usc.</div><div style="text-align:right">Rnt.</div><div style="text-align:right">Netto</div>
+      </div>`;
+  } catch(e) { body.innerHTML = `<div class="t-error t-small">${esc(e.message)}</div>`; }
 }
 
 async function dbSetCheckRequired(itemId, val) {
@@ -1619,34 +1691,30 @@ function buildClRows(filter) {
     </div>`;
     entries.forEach(({ row, item }) => {
       const hasChanges = row.out_qty > 0 || row.return_qty > 0;
+      const metaParts = [`Max: ${item.quantity}`];
+      if (phase === 'return') metaParts.push(`usciti: ${row.out_qty || 0}`);
+      if (item.notes) metaParts.push(esc(item.notes.substring(0, 50)));
+
+      const isOut  = phase === 'out';
+      const field  = isOut ? 'out_qty'    : 'return_qty';
+      const val    = isOut ? (row.out_qty || 0) : (row.return_qty || 0);
+      const maxVal = isOut ? item.quantity : (row.out_qty || 0);
+      const label  = isOut ? 'Uscita'     : 'Rientro';
+
       html += `<div class="cl-row ${hasChanges ? 'has-changes' : ''}" data-item="${item.id}">
-        <div class="cl-row-name">${esc(itemName(item.description))}</div>
-        <div class="cl-row-meta">Max: ${item.quantity}${item.notes ? ' · ' + esc(item.notes.substring(0,60)) : ''}</div>
-        <div class="cl-qty-cols">
-          ${phase === 'out' ? `
-          <div>
-            <div class="cl-qty-label">Uscita</div>
-            <div class="qty-row">
-              <button class="qty-btn" data-action="dec" data-field="out_qty" data-item="${item.id}" ${readonly?'disabled':''}>−</button>
-              <input class="qty-input" type="number" min="0" max="${item.quantity}"
-                     value="${row.out_qty || 0}" data-field="out_qty" data-item="${item.id}"
-                     ${readonly?'readonly':''}>
-              <button class="qty-btn" data-action="inc" data-field="out_qty" data-item="${item.id}" ${readonly?'disabled':''}>+</button>
-            </div>
-          </div>` : `
-          <div>
-            <div class="cl-qty-label" style="display:flex;align-items:center;gap:6px">
-              Rientro
-              <span class="t-meta" style="font-size:11px">(usciti: ${row.out_qty || 0})</span>
-            </div>
-            <div class="qty-row">
-              <button class="qty-btn" data-action="dec" data-field="return_qty" data-item="${item.id}" ${readonly?'disabled':''}>−</button>
-              <input class="qty-input" type="number" min="0" max="${row.out_qty || 0}"
-                     value="${row.return_qty || 0}" data-field="return_qty" data-item="${item.id}"
-                     ${readonly?'readonly':''}>
-              <button class="qty-btn" data-action="inc" data-field="return_qty" data-item="${item.id}" ${readonly?'disabled':''}>+</button>
-            </div>
-          </div>`}
+        <div class="cl-row-info">
+          <div class="cl-row-name">${esc(itemName(item.description))}</div>
+          <div class="cl-row-meta">${metaParts.join(' · ')}</div>
+        </div>
+        <div class="cl-qty-wrap">
+          <div class="cl-qty-label">${label}</div>
+          <div class="qty-row">
+            <button class="qty-btn" data-action="dec" data-field="${field}" data-item="${item.id}" ${readonly?'disabled':''}>−</button>
+            <input class="qty-input" type="number" min="0" max="${maxVal}"
+                   value="${val}" data-field="${field}" data-item="${item.id}"
+                   ${readonly?'readonly':''}>
+            <button class="qty-btn" data-action="inc" data-field="${field}" data-item="${item.id}" ${readonly?'disabled':''}>+</button>
+          </div>
         </div>
       </div>`;
     });
@@ -1663,7 +1731,8 @@ function buildClRows(filter) {
       const inv = itemMap[itemId];
       if (!row || !inv) return;
       let val = row[field] || 0;
-      val = action === 'inc' ? Math.min(val + 1, inv.quantity) : Math.max(val - 1, 0);
+      const maxV = field === 'return_qty' ? (row.out_qty || 0) : inv.quantity;
+      val = action === 'inc' ? Math.min(val + 1, maxV) : Math.max(val - 1, 0);
       row[field] = val;
       const input = area.querySelector(`input[data-field="${field}"][data-item="${itemId}"]`);
       if (input) input.value = val;
@@ -1767,12 +1836,16 @@ async function renderAdmin() {
           <div class="avail-num">Disp.</div>
         </div>
         ${withOut.map(a => `
-          <div class="avail-row">
+          <div class="avail-row" data-item-id="${esc(a.id)}" data-item-name="${esc(itemName(a.description))}">
             <div style="font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(itemName(a.description))}</div>
             <div class="avail-num">${a.quantity}</div>
             <div class="avail-num out">${a.out}</div>
             <div class="avail-num ${a.avail === 0 ? 'zero' : 'avail'}">${a.avail}</div>
           </div>`).join('')}`;
+
+      availEl.querySelectorAll('.avail-row[data-item-id]').forEach(row => {
+        row.addEventListener('click', () => openItemEngagementsModal(row.dataset.itemId, row.dataset.itemName));
+      });
     }
 
     const clEl = document.getElementById('admin-cl-list');
