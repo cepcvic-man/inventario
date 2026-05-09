@@ -1722,18 +1722,23 @@ async function resetClTotal() {
   closeResetModal();
   showLoading(true);
   try {
-    const { error } = await sb.from('checklist_rows').delete().eq('checklist_id', S.currentClId);
+    // Upsert floor values — se non c'è floor usa 0, non cancella mai la checklist
+    const upserts = S.inventoryItems.map(item => {
+      const f = S.submittedFloor[item.id] || { out_qty: 0, return_qty: 0 };
+      return { checklist_id: S.currentClId, item_id: item.id, out_qty: f.out_qty, return_qty: f.return_qty, updated_at: new Date().toISOString() };
+    });
+    const { error } = await sb.from('checklist_rows').upsert(upserts, { onConflict: 'checklist_id,item_id' });
     if (error) throw error;
-    await dbJournal(S.currentClId, 'change', 'Checklist azzerata completamente', null);
-    S.currentClRows = S.inventoryItems.map(item => ({
-      id: null, checklist_id: S.currentClId, item_id: item.id,
-      out_qty: 0, return_qty: 0
-    }));
-    S.dbBaseline   = {};
-    S.currentClRows.forEach(r => { S.dbBaseline[r.item_id] = { out_qty: 0, return_qty: 0 }; });
+    await dbJournal(S.currentClId, 'change', 'Righe ripristinate all\'ultimo invio', null);
+    S.currentClRows = S.inventoryItems.map(item => {
+      const f = S.submittedFloor[item.id] || { out_qty: 0, return_qty: 0 };
+      return { id: null, checklist_id: S.currentClId, item_id: item.id, out_qty: f.out_qty, return_qty: f.return_qty };
+    });
+    S.dbBaseline = {};
+    S.currentClRows.forEach(r => { S.dbBaseline[r.item_id] = { out_qty: r.out_qty || 0, return_qty: r.return_qty || 0 }; });
     S.sessionDirty = new Set();
     buildClRows(document.getElementById('cl-search')?.value || '');
-    showToast('Checklist azzerata.', '');
+    showToast('Ripristinato all\'ultimo invio.', '');
   } catch(e) { showToast(e.message, 'error'); }
   finally { showLoading(false); }
 }
