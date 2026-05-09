@@ -2403,28 +2403,23 @@ function wireEvents() {
 
   document.getElementById('btn-check-update').addEventListener('click', async () => {
     const btn = document.getElementById('btn-check-update');
-    const orig = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = '<span>Verifica in corso…</span>';
+    btn.innerHTML = '<span>Aggiornamento in corso…</span>';
     try {
-      if (window._swReg) {
-        await window._swReg.update();
-        // Se nessun aggiornamento trovato entro 3s, avvisa
-        setTimeout(() => {
-          if (!document.getElementById('update-banner').classList.contains('hidden')) return;
-          showToast('Sei già all\'ultima versione.', 'success');
-          btn.disabled = false;
-          btn.innerHTML = orig;
-        }, 3000);
-      } else {
-        showToast('Service worker non disponibile.', 'error');
-        btn.disabled = false;
-        btn.innerHTML = orig;
+      // Nuclear update: de-registra SW + pulisce cache + ricarica
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(r => r.unregister()));
       }
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+      }
+      window.location.replace(location.pathname + '?_r=' + Date.now());
     } catch(e) {
-      showToast('Errore verifica: ' + e.message, 'error');
+      showToast('Errore: ' + e.message, 'error');
       btn.disabled = false;
-      btn.innerHTML = orig;
+      btn.innerHTML = '<span>Controlla aggiornamenti</span>';
     }
   });
 
@@ -2668,7 +2663,7 @@ async function init() {
 // VERSION CHECK — bypassa Brave e qualsiasi cache aggressiva
 // Incrementa APP_VERSION ad ogni deploy insieme a version.json e SW_VER
 // ════════════════════════════════════════════════════════════
-const APP_VERSION = 2;
+const APP_VERSION = 3;
 
 async function checkVersion() {
   try {
@@ -2676,6 +2671,11 @@ async function checkVersion() {
     if (!res.ok) return;
     const { v } = await res.json();
     if (v !== APP_VERSION) {
+      // De-registra tutti i service worker (altrimenti il vecchio SW rimane attivo)
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(r => r.unregister()));
+      }
       // Svuota tutte le cache (SW + browser)
       if ('caches' in window) {
         const keys = await caches.keys();
@@ -2691,7 +2691,7 @@ async function checkVersion() {
 checkVersion().then(() => init()).catch(console.error);
 
 if ('serviceWorker' in navigator) {
-  const SW_VER = '2'; // incrementa ad ogni deploy per forzare re-check su Android
+  const SW_VER = '3'; // incrementa ad ogni deploy per forzare re-check su Android
   let _swUpdating = false;
 
   function showUpdateBanner() {

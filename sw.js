@@ -1,4 +1,4 @@
-const CACHE = 'cepc-v2';
+const CACHE = 'cepc-v3';
 const STATIC = [
   'index.html',
   'manifest.json',
