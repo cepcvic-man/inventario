@@ -2357,14 +2357,26 @@ function wireEvents() {
 
     // Articoli usati che richiedono verifica funzionamento
     const checkItems = S.currentClRows.filter(r => {
-      // Solo articoli presi da QUESTA checklist con out_qty > 0
       if (!(r.out_qty > 0)) return false;
       const item = S.inventoryItems.find(i => i.id === r.item_id);
       return item?.check_required;
     });
 
     if (checkItems.length > 0) {
-      openCheckFnModal(checkItems);
+      // Escludi articoli già verificati da questo operatore in checklist precedenti
+      const checkItemIds = checkItems.map(r => r.item_id);
+      const { data: prevChecks } = await sb.from('checklist_checks')
+        .select('item_id')
+        .in('item_id', checkItemIds)
+        .eq('created_by', S.session.user.id)
+        .neq('checklist_id', S.currentClId);
+      const alreadyVerified = new Set((prevChecks || []).map(c => c.item_id));
+      const pendingChecks = checkItems.filter(r => !alreadyVerified.has(r.item_id));
+      if (pendingChecks.length > 0) {
+        openCheckFnModal(pendingChecks);
+      } else {
+        await doSubmitChecklist();
+      }
     } else {
       await doSubmitChecklist();
     }
@@ -2510,7 +2522,15 @@ init().catch(console.error);
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(err => {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      // Quando un nuovo SW prende il controllo, ricarica per servire assets freschi
+      let reloading = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (reloading) return;
+        reloading = true;
+        window.location.reload();
+      });
+    }).catch(err => {
       console.warn('SW registration failed:', err);
     });
   });
