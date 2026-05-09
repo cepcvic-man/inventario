@@ -1130,9 +1130,23 @@
         border-radius:var(--radius-sm);padding:14px 16px;cursor:pointer;
         transition:background .12s;text-align:left;width:100%">
         <span style="font-size:15px;font-weight:600;color:var(--danger)">Reset totale</span>
-        <span style="font-size:13px;color:var(--danger);opacity:.75">Cancella tutto dal database — checklist torna a zero</span>
+        <span style="font-size:13px;color:var(--danger);opacity:.75">Riporta la checklist ai valori dell'ultimo invio</span>
       </button>
       <button id="btn-reset-cancel" class="btn btn-ghost btn-block" style="margin-top:4px">Annulla</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modale conferma invio con diff -->
+<div id="modal-submit-confirm" class="modal-backdrop hidden">
+  <div class="modal-sheet" style="max-height:82vh;display:flex;flex-direction:column">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Conferma invio</div>
+    <div class="t-small t-muted" style="margin-bottom:14px">Variazioni rispetto all'ultimo invio:</div>
+    <div id="submit-diff-list" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:8px"></div>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button id="btn-submit-confirm-cancel" class="btn btn-ghost" style="flex:1">Annulla</button>
+      <button id="btn-submit-confirm-ok" class="btn btn-primary" style="flex:1">Invia</button>
     </div>
   </div>
 </div>
@@ -1650,6 +1664,50 @@ async function confirmDeleteItem(itemId) {
     showToast('Articolo eliminato.', 'success');
   } catch(e) { showToast(e.message, 'error'); }
   finally { showLoading(false); }
+}
+
+let _pendingChecksFn = [];
+
+function openSubmitConfirmModal(pendingChecks) {
+  _pendingChecksFn = pendingChecks || [];
+  const list = document.getElementById('submit-diff-list');
+  const floor = S.submittedFloor;
+  const hasFloor = Object.keys(floor).length > 0;
+  const ref = hasFloor ? floor : S.dbBaseline;
+
+  const diffs = [];
+  S.currentClRows.forEach(r => {
+    const base = ref[r.item_id] || { out_qty: 0, return_qty: 0 };
+    const outDiff = (r.out_qty || 0) - base.out_qty;
+    const retDiff = (r.return_qty || 0) - base.return_qty;
+    if (outDiff !== 0 || retDiff !== 0) {
+      const item = S.inventoryItems.find(i => i.id === r.item_id);
+      diffs.push({ item, row: r, base, outDiff, retDiff });
+    }
+  });
+
+  if (diffs.length === 0) {
+    list.innerHTML = '<div class="t-small t-muted" style="text-align:center;padding:20px">Nessuna variazione rispetto all\'ultimo invio.</div>';
+  } else {
+    list.innerHTML = diffs.map(({ item, row, base, outDiff, retDiff }) => {
+      const name = esc(itemName(item?.description || ''));
+      const parts = [];
+      if (outDiff !== 0) {
+        const sign = outDiff > 0 ? '+' : '';
+        parts.push(`<span>Uscite: <b>${base.out_qty} → ${row.out_qty || 0}</b> <span style="color:${outDiff>0?'var(--danger)':'var(--success)'}">(${sign}${outDiff})</span></span>`);
+      }
+      if (retDiff !== 0) {
+        const sign = retDiff > 0 ? '+' : '';
+        parts.push(`<span>Rientri: <b>${base.return_qty} → ${row.return_qty || 0}</b> <span style="color:${retDiff>0?'var(--success)':'var(--danger)'}">(${sign}${retDiff})</span></span>`);
+      }
+      return `<div style="padding:10px 12px;background:var(--surface-alt);border-radius:var(--radius-sm);display:flex;flex-direction:column;gap:4px">
+        <div class="t-body" style="font-weight:600">${name}</div>
+        <div class="t-small" style="display:flex;flex-direction:column;gap:2px">${parts.join('')}</div>
+      </div>`;
+    }).join('');
+  }
+
+  document.getElementById('modal-submit-confirm').classList.remove('hidden');
 }
 
 function openCheckFnModal(rows) {
@@ -2527,15 +2585,16 @@ function wireEvents() {
     } catch(e) { showToast(e.message, 'error'); showLoading(false); return; }
     showLoading(false);
 
-    // Articoli usati che richiedono verifica funzionamento
+    // Articoli con out_qty aumentato rispetto al floor che richiedono verifica funzionamento
     const checkItems = S.currentClRows.filter(r => {
-      if (!(r.out_qty > 0)) return false;
+      const floorQty = S.submittedFloor[r.item_id]?.out_qty || 0;
+      if (!(r.out_qty > floorQty)) return false;
       const item = S.inventoryItems.find(i => i.id === r.item_id);
       return item?.check_required;
     });
 
+    let pendingChecks = [];
     if (checkItems.length > 0) {
-      // Escludi articoli già verificati da questo operatore in checklist precedenti
       const checkItemIds = checkItems.map(r => r.item_id);
       const { data: prevChecks } = await sb.from('checklist_checks')
         .select('item_id')
@@ -2543,15 +2602,10 @@ function wireEvents() {
         .eq('created_by', S.session.user.id)
         .neq('checklist_id', S.currentClId);
       const alreadyVerified = new Set((prevChecks || []).map(c => c.item_id));
-      const pendingChecks = checkItems.filter(r => !alreadyVerified.has(r.item_id));
-      if (pendingChecks.length > 0) {
-        openCheckFnModal(pendingChecks);
-      } else {
-        await doSubmitChecklist();
-      }
-    } else {
-      await doSubmitChecklist();
+      pendingChecks = checkItems.filter(r => !alreadyVerified.has(r.item_id));
     }
+
+    openSubmitConfirmModal(pendingChecks);
   });
 
   document.getElementById('btn-check-fn-confirm').addEventListener('click', async () => {
@@ -2578,6 +2632,19 @@ function wireEvents() {
 
   document.getElementById('btn-check-fn-cancel').addEventListener('click', () => {
     document.getElementById('modal-check-fn').classList.add('hidden');
+  });
+
+  document.getElementById('btn-submit-confirm-cancel').addEventListener('click', () => {
+    document.getElementById('modal-submit-confirm').classList.add('hidden');
+  });
+
+  document.getElementById('btn-submit-confirm-ok').addEventListener('click', async () => {
+    document.getElementById('modal-submit-confirm').classList.add('hidden');
+    if (_pendingChecksFn.length > 0) {
+      openCheckFnModal(_pendingChecksFn);
+    } else {
+      await doSubmitChecklist();
+    }
   });
 
   // Close checklist (admin only)
