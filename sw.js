@@ -33,6 +33,12 @@ self.addEventListener('fetch', e => {
     return;
   }
 
+  // version.json — mai in cache, sempre rete
+  if (url.pathname.endsWith('version.json')) {
+    e.respondWith(fetch(e.request, { cache: 'no-store' }).catch(() => new Response('{}', { headers: { 'Content-Type': 'application/json' } })));
+    return;
+  }
+
   // index.html — network-first: sempre HTML fresco, fallback cache
   if (url.pathname === '/' || url.pathname.endsWith('index.html')) {
     e.respondWith(

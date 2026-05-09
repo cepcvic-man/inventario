@@ -2577,7 +2577,31 @@ async function init() {
   });
 }
 
-init().catch(console.error);
+// ════════════════════════════════════════════════════════════
+// VERSION CHECK — bypassa Brave e qualsiasi cache aggressiva
+// Incrementa APP_VERSION ad ogni deploy insieme a version.json e SW_VER
+// ════════════════════════════════════════════════════════════
+const APP_VERSION = 2;
+
+async function checkVersion() {
+  try {
+    const res = await fetch('version.json?_=' + Date.now(), { cache: 'no-store' });
+    if (!res.ok) return;
+    const { v } = await res.json();
+    if (v !== APP_VERSION) {
+      // Svuota tutte le cache (SW + browser)
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+      }
+      // Ricarica con URL cache-bust → il browser non può servire nulla dalla sua cache HTTP
+      window.location.replace(location.pathname + '?_r=' + Date.now());
+      await new Promise(() => {}); // blocca l'esecuzione mentre il redirect avviene
+    }
+  } catch (_) { /* offline — salta il check */ }
+}
+
+checkVersion().then(() => init()).catch(console.error);
 
 if ('serviceWorker' in navigator) {
   const SW_VER = '2'; // incrementa ad ogni deploy per forzare re-check su Android
