@@ -546,6 +546,7 @@
       margin: 0 12px 6px;
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
       gap: 12px;
       transition: border-color .15s, background .15s;
     }
@@ -558,6 +559,15 @@
     .cl-row-meta { font-size: 11px; color: var(--text-3); margin-top: 2px; }
     .cl-qty-label { font-size: 10px; font-weight: 700; color: var(--text-3); margin-bottom: 3px; text-transform: uppercase; letter-spacing: .5px; text-align: center; }
     .cl-qty-wrap  { flex-shrink: 0; }
+    .cl-row-notes {
+      flex-basis: 100%;
+      font-size: 11px;
+      color: var(--text-3);
+      padding-top: 7px;
+      margin-top: 4px;
+      border-top: 1px solid var(--border);
+      line-height: 1.4;
+    }
 
     /* Search bar */
     .search-bar {
@@ -1437,7 +1447,7 @@ async function dbDeleteItem(id) {
 async function dbGetItemEngagements(itemId) {
   const { data: rows, error } = await sb
     .from('checklist_rows')
-    .select('checklist_id, out_qty, return_qty, checklists(id, title, status, created_at, operator_id)')
+    .select('checklist_id, out_qty, return_qty, checklists(id, title, status, created_at, submitted_at, updated_at, operator_id)')
     .eq('item_id', itemId)
     .gt('out_qty', 0);
   if (error) throw error;
@@ -1454,7 +1464,7 @@ async function dbGetItemEngagements(itemId) {
   return open.map(r => ({
     cl_id:       r.checklists.id,
     cl_title:    r.checklists.title,
-    cl_date:     r.checklists.created_at,
+    cl_date:     r.checklists.submitted_at || r.checklists.updated_at || r.checklists.created_at,
     out_qty:     r.out_qty,
     return_qty:  r.return_qty || 0,
     net:         r.out_qty - (r.return_qty || 0),
@@ -2114,7 +2124,6 @@ function buildClRows(filter) {
       const metaParts = [phase === 'out'
         ? `Disponibile: ${availForThis}`
         : `Usciti: ${row.out_qty || 0}`];
-      if (item.notes) metaParts.push(esc(item.notes.substring(0, 50)));
 
       const isOut  = phase === 'out';
       const field  = isOut ? 'out_qty'    : 'return_qty';
@@ -2139,6 +2148,7 @@ function buildClRows(filter) {
             <button class="qty-btn" data-action="inc" data-field="${field}" data-item="${item.id}" ${readonly?'disabled':''}>+</button>
           </div>
         </div>
+        ${item.notes ? `<div class="cl-row-notes">${esc(item.notes)}</div>` : ''}
       </div>`;
     });
   });
