@@ -1502,7 +1502,10 @@ function showToast(msg, type = '') {
 }
 
 function navigate(tab) {
-  if (tab === S.currentTab) return;
+  if (tab === S.currentTab) {
+    if (tab === 'home') renderHome(); // home aggiorna sempre
+    return;
+  }
   S.currentTab = tab;
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
@@ -1526,6 +1529,7 @@ function openClDetail(clId) {
   S.currentTab  = 'cl-detail';
   S.clPhase     = 'out';
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('page-cl-detail').classList.add('active');
   renderClDetail();
 }
@@ -1663,7 +1667,7 @@ function fmtDateTime(iso) {
 function statusBadge(cl) {
   if (cl.status === 'closed') return '<span class="badge badge-closed">Chiusa</span>';
   if (cl.submitted_at)        return '<span class="badge badge-submit">Inviata</span>';
-  return '<span class="badge badge-open">Aperta</span>';
+  return '<span class="badge badge-issue">In sospeso</span>';
 }
 
 const SEC_COLORS = [
@@ -1806,11 +1810,27 @@ async function renderChecklists() {
 async function renderClDetail() {
   showLoading(true);
   try {
+    S.sessionDirty = new Set();
+    S.otherClNet   = {};
+
     const [cl, dbRows] = await Promise.all([
       dbGetChecklist(S.currentClId),
       dbGetChecklistRows(S.currentClId)
     ]);
     S.currentCl = cl;
+
+    // Quantità nette impegnate in ALTRE checklist aperte (per calcolare disponibilità reale)
+    const { data: openCls } = await sb.from('checklists')
+      .select('id').eq('status', 'open').neq('id', S.currentClId);
+    const otherOpenIds = (openCls || []).map(c => c.id);
+    if (otherOpenIds.length > 0) {
+      const { data: otherRows } = await sb.from('checklist_rows')
+        .select('item_id, out_qty, return_qty').in('checklist_id', otherOpenIds);
+      (otherRows || []).forEach(r => {
+        const net = Math.max(0, (r.out_qty || 0) - (r.return_qty || 0));
+        S.otherClNet[r.item_id] = (S.otherClNet[r.item_id] || 0) + net;
+      });
+    }
 
     const rowMap = {};
     dbRows.forEach(r => { rowMap[r.item_id] = { ...r }; });
@@ -1892,15 +1912,17 @@ function buildClRows(filter) {
       <span class="t-meta" style="margin-left:auto">${entries.length} articoli</span>
     </div>`;
     entries.forEach(({ row, item }) => {
-      const hasChanges = row.out_qty > 0 || row.return_qty > 0;
-      const metaParts = [`Max: ${item.quantity}`];
-      if (phase === 'return') metaParts.push(`usciti: ${row.out_qty || 0}`);
+      const hasChanges = S.sessionDirty?.has(row.item_id) ?? false;
+      const availForThis = Math.max(0, item.quantity - (S.otherClNet?.[item.id] || 0));
+      const metaParts = [phase === 'out'
+        ? `Disponibile: ${availForThis}`
+        : `Usciti: ${row.out_qty || 0}`];
       if (item.notes) metaParts.push(esc(item.notes.substring(0, 50)));
 
       const isOut  = phase === 'out';
       const field  = isOut ? 'out_qty'    : 'return_qty';
       const val    = isOut ? (row.out_qty || 0) : (row.return_qty || 0);
-      const maxVal = isOut ? item.quantity : (row.out_qty || 0);
+      const maxVal = isOut ? availForThis : (row.out_qty || 0);
       const label  = isOut ? 'Uscita'     : 'Rientro';
 
       html += `<div class="cl-row ${hasChanges ? 'has-changes' : ''}" data-item="${item.id}">
@@ -1933,13 +1955,16 @@ function buildClRows(filter) {
       const inv = itemMap[itemId];
       if (!row || !inv) return;
       let val = row[field] || 0;
-      const maxV = field === 'return_qty' ? (row.out_qty || 0) : inv.quantity;
+      const maxV = field === 'return_qty'
+        ? (row.out_qty || 0)
+        : Math.max(0, inv.quantity - (S.otherClNet?.[inv.id] || 0));
       val = action === 'inc' ? Math.min(val + 1, maxV) : Math.max(val - 1, 0);
       row[field] = val;
+      S.sessionDirty?.add(itemId);
       const input = area.querySelector(`input[data-field="${field}"][data-item="${itemId}"]`);
       if (input) input.value = val;
       const card = btn.closest('.cl-row');
-      if (card) card.classList.toggle('has-changes', val > 0);
+      if (card) card.classList.toggle('has-changes', S.sessionDirty?.has(itemId) ?? false);
     });
   });
 
@@ -1950,9 +1975,15 @@ function buildClRows(filter) {
       if (!row) return;
       if (field === 'out_qty' || field === 'return_qty') {
         const inv = itemMap[itemId];
-        const v = Math.max(0, Math.min(parseInt(input.value) || 0, inv?.quantity || 9999));
+        const maxV = field === 'return_qty'
+          ? (row.out_qty || 0)
+          : Math.max(0, (inv?.quantity || 9999) - (S.otherClNet?.[itemId] || 0));
+        const v = Math.max(0, Math.min(parseInt(input.value) || 0, maxV));
         row[field] = v;
         input.value = v;
+        S.sessionDirty?.add(itemId);
+        const card = area.querySelector(`.cl-row[data-item="${itemId}"]`);
+        if (card) card.classList.toggle('has-changes', true);
       }
     });
   });
@@ -2326,7 +2357,8 @@ function wireEvents() {
 
     // Articoli usati che richiedono verifica funzionamento
     const checkItems = S.currentClRows.filter(r => {
-      if (!(r.out_qty > 0 || r.return_qty > 0)) return false;
+      // Solo articoli presi da QUESTA checklist con out_qty > 0
+      if (!(r.out_qty > 0)) return false;
       const item = S.inventoryItems.find(i => i.id === r.item_id);
       return item?.check_required;
     });
