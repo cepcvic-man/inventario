@@ -115,12 +115,18 @@
     }
 
     .page-header {
-      padding: 56px 20px 16px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
+      padding: calc(env(safe-area-inset-top, 0px) + 16px) 20px 14px;
+      background: var(--primary);
       position: sticky;
       top: 0;
       z-index: 10;
+    }
+    .page-header .t-title,
+    .page-header .t-h2    { color: oklch(99% 0.004 75); }
+    .page-header .t-muted { color: oklch(86% 0.06 155); }
+    .page-header .btn-secondary {
+      background: oklch(100% 0 0 / .15);
+      color: oklch(99% 0.004 75);
     }
     .page-header-row {
       display: flex;
@@ -130,12 +136,12 @@
     .back-btn {
       width: 36px; height: 36px;
       border-radius: 50%;
-      background: var(--bg);
+      background: oklch(100% 0 0 / .15);
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
-      color: var(--text);
+      color: oklch(99% 0.004 75);
     }
-    .back-btn:active { background: var(--bg-alt); }
+    .back-btn:active { background: oklch(100% 0 0 / .28); }
 
     .scroll-area {
       flex: 1;
@@ -168,10 +174,12 @@
     .card + .card { margin-top: 10px; }
 
     .home-header {
-      padding: 52px 20px 20px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
+      padding: calc(env(safe-area-inset-top, 0px) + 22px) 20px 20px;
+      background: var(--primary);
     }
+    .home-header .t-meta  { color: oklch(86% 0.06 155); }
+    .home-header .t-title { color: oklch(99% 0.004 75); font-size: 26px; letter-spacing: -.5px; }
+    .home-header .t-muted { color: oklch(82% 0.05 155); }
 
     .card-tap {
       transition: transform .12s ease, box-shadow .12s ease;
@@ -667,6 +675,38 @@
     .avail-num.out   { color: var(--primary); }
     .avail-num.avail { color: var(--success); }
     .avail-num.zero  { color: var(--danger); }
+
+    /* ═══════════════════════════════════════════
+       DESKTOP WRAPPER (mobile-first centrato)
+    ═══════════════════════════════════════════ */
+    @media (min-width: 481px) {
+      body {
+        background: oklch(16% 0.04 155);
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+      }
+      #page-login {
+        max-width: 480px;
+        min-height: 100dvh;
+        width: 100%;
+        box-shadow: 0 0 60px oklch(0% 0 0 / .5);
+      }
+      #app-shell {
+        max-width: 480px;
+        width: 100%;
+        min-height: 100dvh;
+        box-shadow: 0 0 60px oklch(0% 0 0 / .5);
+      }
+      #bottom-nav {
+        left: 50%;
+        transform: translateX(-50%);
+        max-width: 480px;
+        width: 480px;
+      }
+      .fab { right: calc(50vw - 224px); }
+      #toast { left: calc(50vw - 224px); right: calc(50vw - 224px); }
+    }
   </style>
 </head>
 <body>
@@ -848,6 +888,47 @@
     </div>
   </div>
 
+  <!-- ── PROFILO ── -->
+  <div id="page-profile" class="page">
+    <div class="page-header">
+      <div class="t-title">Profilo</div>
+      <div class="t-small t-muted" id="profile-email-label">–</div>
+    </div>
+    <div class="scroll-area">
+      <div class="section">
+        <div class="section-label">Dati personali</div>
+        <div class="card" style="display:flex;flex-direction:column;gap:0">
+          <div class="form-group">
+            <label class="form-label" for="pp-fullname">Nome e cognome</label>
+            <input id="pp-fullname" class="form-control" type="text" placeholder="Mario Rossi" autocomplete="name">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="pp-congregation">Congregazione</label>
+            <input id="pp-congregation" class="form-control" type="text" placeholder="Es. Vicenza Sud">
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" for="pp-phone">Telefono</label>
+            <input id="pp-phone" class="form-control" type="tel" placeholder="+39 000 000 0000" autocomplete="tel">
+          </div>
+        </div>
+      </div>
+      <div class="section" style="padding-top:8px">
+        <button id="btn-profile-save" class="btn btn-primary btn-block">Salva</button>
+      </div>
+      <div class="section" style="padding-top:4px">
+        <button id="btn-profile-logout" class="btn btn-block" style="background:var(--danger-soft);color:var(--danger);gap:8px">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Esci dall'account
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ── BOTTOM NAV ── -->
   <nav id="bottom-nav">
     <button class="nav-tab active" data-tab="home">
@@ -880,14 +961,14 @@
       </svg>
       <span>Admin</span>
     </button>
-    <button class="nav-tab hidden" id="btn-nav-profile" title="Profilo">
+    <button class="nav-tab" data-tab="profile" id="btn-nav-profile" title="Profilo">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
            stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
       </svg>
       <span>Profilo</span>
     </button>
-    <button class="nav-tab" id="btn-logout" title="Esci">
+    <button class="nav-tab hidden" id="btn-logout" title="Esci">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
            stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
@@ -1389,13 +1470,15 @@ function navigate(tab) {
     home:       'page-home',
     checklists: 'page-checklists',
     inventory:  'page-inventory',
-    admin:      'page-admin'
+    admin:      'page-admin',
+    profile:    'page-profile'
   };
   document.getElementById(map[tab])?.classList.add('active');
   if (tab === 'home')       renderHome();
   if (tab === 'checklists') renderChecklists();
   if (tab === 'inventory')  renderInventory();
   if (tab === 'admin')      renderAdmin();
+  if (tab === 'profile')    renderProfile();
 }
 
 function openClDetail(clId) {
@@ -2076,6 +2159,17 @@ function showProfileModal(onSaved) {
 }
 
 // ════════════════════════════════════════════════════════════
+// PROFILE PAGE
+// ════════════════════════════════════════════════════════════
+function renderProfile() {
+  const p = S.operatorProfile || {};
+  document.getElementById('profile-email-label').textContent = S.session?.user?.email || '';
+  document.getElementById('pp-fullname').value     = p.fullName     || '';
+  document.getElementById('pp-congregation').value = p.congregation || '';
+  document.getElementById('pp-phone').value        = p.phone        || '';
+}
+
+// ════════════════════════════════════════════════════════════
 // EVENT WIRING
 // ════════════════════════════════════════════════════════════
 function wireEvents() {
@@ -2101,9 +2195,27 @@ function wireEvents() {
     document.getElementById('modal-new-cl').classList.add('hidden')
   );
 
-  document.getElementById('btn-nav-profile')?.addEventListener('click', () =>
-    showProfileModal(null)
-  );
+  document.getElementById('btn-profile-save').addEventListener('click', async () => {
+    const fn = document.getElementById('pp-fullname').value.trim();
+    const cg = document.getElementById('pp-congregation').value.trim();
+    const ph = document.getElementById('pp-phone').value.trim();
+    if (!fn) { showToast('Inserisci nome e cognome.', 'error'); return; }
+    showLoading(true);
+    try {
+      const profile = { fullName: fn, congregation: cg, phone: ph };
+      await dbSaveProfile(S.session.user.id, profile);
+      S.operatorProfile = profile;
+      showToast('Profilo salvato.', 'success');
+    } catch(e) {
+      showToast('Errore: ' + e.message, 'error');
+    } finally { showLoading(false); }
+  });
+
+  document.getElementById('btn-profile-logout').addEventListener('click', async () => {
+    if (!confirm('Esci dall\'account?')) return;
+    await sb.auth.signOut();
+    location.reload();
+  });
 
   document.getElementById('btn-logout').addEventListener('click', async () => {
     if (!confirm('Esci dall\'account?')) return;
@@ -2282,8 +2394,7 @@ async function onLoginSuccess() {
 
   S.inventoryItems = await dbGetInventory();
 
-  // Pulsante profilo solo per operatori
-  document.getElementById('btn-nav-profile').classList.toggle('hidden', S.role !== 'operator');
+  document.getElementById('btn-nav-profile').classList.remove('hidden');
 
   // Operators must have a profile; show setup modal if missing
   if (S.role === 'operator') {
