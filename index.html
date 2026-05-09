@@ -1504,10 +1504,7 @@ async function dbSaveChecks(clId, checks) {
 }
 
 async function dbSubmitChecklist(clId) {
-  const { error } = await sb.from('checklists').update({
-    submitted_at: new Date().toISOString(),
-    updated_at:   new Date().toISOString()
-  }).eq('id', clId);
+  const { error } = await sb.rpc('submit_checklist', { cl_id: clId });
   if (error) throw error;
   await dbJournal(clId, 'submit', 'Checklist inviata', null);
 }
