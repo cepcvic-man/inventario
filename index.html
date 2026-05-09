@@ -1298,6 +1298,7 @@ const S = {
   currentCl:      null,     // testata checklist aperta
   operatorProfile: null,    // {fullName, congregation, phone} decifrato dal DB
   clPhase:         'out',   // 'out' | 'return'
+  submittedFloor:  {},      // { item_id: {out_qty, return_qty} } — floor dopo submit
 };
 
 // ════════════════════════════════════════════════════════════
@@ -1952,6 +1953,16 @@ async function renderClDetail() {
     });
     S.currentClRows = Object.values(rowMap);
 
+    // Snapshot floor: se già inviata i valori attuali sono il minimo non valicabile
+    if (cl.submitted_at) {
+      S.submittedFloor = {};
+      S.currentClRows.forEach(r => {
+        S.submittedFloor[r.item_id] = { out_qty: r.out_qty || 0, return_qty: r.return_qty || 0 };
+      });
+    } else {
+      S.submittedFloor = {};
+    }
+
     document.getElementById('cl-detail-title').textContent = cl.title;
     document.getElementById('cl-detail-badge').innerHTML   = statusBadge(cl);
 
@@ -2035,6 +2046,8 @@ function buildClRows(filter) {
       const val    = isOut ? (row.out_qty || 0) : (row.return_qty || 0);
       const maxVal = isOut ? availForThis : (row.out_qty || 0);
       const label  = isOut ? 'Uscita'     : 'Rientro';
+      const floor  = S.submittedFloor?.[item.id];
+      const minVal = floor ? (isOut ? floor.out_qty : floor.return_qty) : 0;
 
       html += `<div class="cl-row ${hasChanges ? 'has-changes' : ''}" data-item="${item.id}">
         <div class="cl-row-info">
@@ -2045,7 +2058,7 @@ function buildClRows(filter) {
           <div class="cl-qty-label">${label}</div>
           <div class="qty-row">
             <button class="qty-btn" data-action="dec" data-field="${field}" data-item="${item.id}" ${readonly?'disabled':''}>−</button>
-            <input class="qty-input" type="number" min="0" max="${maxVal}"
+            <input class="qty-input" type="number" min="${minVal}" max="${maxVal}"
                    value="${val}" data-field="${field}" data-item="${item.id}"
                    ${readonly?'readonly':''}>
             <button class="qty-btn" data-action="inc" data-field="${field}" data-item="${item.id}" ${readonly?'disabled':''}>+</button>
@@ -2069,7 +2082,9 @@ function buildClRows(filter) {
       const maxV = field === 'return_qty'
         ? (row.out_qty || 0)
         : Math.max(0, inv.quantity - (S.otherClNet?.[inv.id] || 0));
-      val = action === 'inc' ? Math.min(val + 1, maxV) : Math.max(val - 1, 0);
+      const floorV = S.submittedFloor?.[itemId];
+      const minV = floorV ? (field === 'return_qty' ? floorV.return_qty : floorV.out_qty) : 0;
+      val = action === 'inc' ? Math.min(val + 1, maxV) : Math.max(val - 1, minV);
       row[field] = val;
       S.sessionDirty?.add(itemId);
       const input = area.querySelector(`input[data-field="${field}"][data-item="${itemId}"]`);
@@ -2089,7 +2104,9 @@ function buildClRows(filter) {
         const maxV = field === 'return_qty'
           ? (row.out_qty || 0)
           : Math.max(0, (inv?.quantity || 9999) - (S.otherClNet?.[itemId] || 0));
-        const v = Math.max(0, Math.min(parseInt(input.value) || 0, maxV));
+        const floorV = S.submittedFloor?.[itemId];
+        const minV = floorV ? (field === 'return_qty' ? floorV.return_qty : floorV.out_qty) : 0;
+        const v = Math.max(minV, Math.min(parseInt(input.value) || 0, maxV));
         row[field] = v;
         input.value = v;
         S.sessionDirty?.add(itemId);
