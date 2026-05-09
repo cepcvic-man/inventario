@@ -1299,6 +1299,7 @@ const S = {
   operatorProfile: null,    // {fullName, congregation, phone} decifrato dal DB
   clPhase:         'out',   // 'out' | 'return'
   submittedFloor:  {},      // { item_id: {out_qty, return_qty} } — floor dopo submit
+  dbBaseline:      {},      // { item_id: {out_qty, return_qty} } — valori DB all'ultimo render/reset
 };
 
 // ════════════════════════════════════════════════════════════
@@ -1708,6 +1709,8 @@ async function resetClPartial() {
       };
     });
     S.currentClRows = Object.values(rowMap);
+    S.dbBaseline    = {};
+    S.currentClRows.forEach(r => { S.dbBaseline[r.item_id] = { out_qty: r.out_qty || 0, return_qty: r.return_qty || 0 }; });
     S.sessionDirty  = new Set();
     buildClRows(document.getElementById('cl-search')?.value || '');
     showToast('Modifiche non salvate annullate.', '');
@@ -1726,11 +1729,21 @@ async function resetClTotal() {
       id: null, checklist_id: S.currentClId, item_id: item.id,
       out_qty: 0, return_qty: 0
     }));
+    S.dbBaseline   = {};
+    S.currentClRows.forEach(r => { S.dbBaseline[r.item_id] = { out_qty: 0, return_qty: 0 }; });
     S.sessionDirty = new Set();
     buildClRows(document.getElementById('cl-search')?.value || '');
     showToast('Checklist azzerata.', '');
   } catch(e) { showToast(e.message, 'error'); }
   finally { showLoading(false); }
+}
+
+function updateDirty(itemId) {
+  const row  = S.currentClRows.find(r => r.item_id === itemId);
+  const base = S.dbBaseline?.[itemId] || { out_qty: 0, return_qty: 0 };
+  const changed = (row.out_qty || 0) !== base.out_qty || (row.return_qty || 0) !== base.return_qty;
+  if (changed) S.sessionDirty?.add(itemId);
+  else         S.sessionDirty?.delete(itemId);
 }
 
 async function doSubmitChecklist(checks) {
@@ -1953,15 +1966,14 @@ async function renderClDetail() {
     });
     S.currentClRows = Object.values(rowMap);
 
-    // Snapshot floor: se già inviata i valori attuali sono il minimo non valicabile
-    if (cl.submitted_at) {
-      S.submittedFloor = {};
-      S.currentClRows.forEach(r => {
-        S.submittedFloor[r.item_id] = { out_qty: r.out_qty || 0, return_qty: r.return_qty || 0 };
-      });
-    } else {
-      S.submittedFloor = {};
-    }
+    // Snapshot baseline (sempre) e floor (solo se già inviata)
+    S.dbBaseline     = {};
+    S.submittedFloor = {};
+    S.currentClRows.forEach(r => {
+      const snap = { out_qty: r.out_qty || 0, return_qty: r.return_qty || 0 };
+      S.dbBaseline[r.item_id] = snap;
+      if (cl.submitted_at) S.submittedFloor[r.item_id] = snap;
+    });
 
     document.getElementById('cl-detail-title').textContent = cl.title;
     document.getElementById('cl-detail-badge').innerHTML   = statusBadge(cl);
@@ -1980,10 +1992,10 @@ async function renderClDetail() {
 
     // Operator: Save + Submit visible when open; admin: Close + Export only
     document.getElementById('btn-cl-save').classList.toggle('hidden',   isAdmin || isClosed);
-    document.getElementById('btn-cl-submit').classList.toggle('hidden', isAdmin || isClosed || !!cl.submitted_at);
+    document.getElementById('btn-cl-submit').classList.toggle('hidden', isAdmin || isClosed);
     document.getElementById('btn-cl-close').classList.toggle('hidden',  !isAdmin || isClosed);
     document.getElementById('btn-cl-export').classList.toggle('hidden', !isAdmin);
-    document.getElementById('btn-cl-reset').classList.toggle('hidden',  isAdmin || isClosed || !!cl.submitted_at);
+    document.getElementById('btn-cl-reset').classList.toggle('hidden',  isAdmin || isClosed);
 
     buildClRows('');
   } finally { showLoading(false); }
@@ -2086,7 +2098,7 @@ function buildClRows(filter) {
       const minV = floorV ? (field === 'return_qty' ? floorV.return_qty : floorV.out_qty) : 0;
       val = action === 'inc' ? Math.min(val + 1, maxV) : Math.max(val - 1, minV);
       row[field] = val;
-      S.sessionDirty?.add(itemId);
+      updateDirty(itemId);
       const input = area.querySelector(`input[data-field="${field}"][data-item="${itemId}"]`);
       if (input) input.value = val;
       const card = btn.closest('.cl-row');
@@ -2109,9 +2121,9 @@ function buildClRows(filter) {
         const v = Math.max(minV, Math.min(parseInt(input.value) || 0, maxV));
         row[field] = v;
         input.value = v;
-        S.sessionDirty?.add(itemId);
+        updateDirty(itemId);
         const card = area.querySelector(`.cl-row[data-item="${itemId}"]`);
-        if (card) card.classList.toggle('has-changes', true);
+        if (card) card.classList.toggle('has-changes', S.sessionDirty?.has(itemId) ?? false);
       }
     });
   });
