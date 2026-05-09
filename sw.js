@@ -1,6 +1,5 @@
-const CACHE = 'cepc-v1';
+const CACHE = 'cepc-v2';
 const STATIC = [
-  '.',
   'index.html',
   'manifest.json',
   'icon-192.png',
@@ -26,15 +25,25 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
 
-  // Network-first for Supabase API calls
+  // Supabase — sempre network
   if (url.hostname.includes('supabase')) {
+    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+    return;
+  }
+
+  // index.html — network-first: sempre HTML fresco, fallback cache
+  if (url.pathname === '/' || url.pathname.endsWith('index.html')) {
     e.respondWith(
-      fetch(e.request).catch(() => caches.match(e.request))
+      fetch(e.request).then(res => {
+        const clone = res.clone();
+        caches.open(CACHE).then(c => c.put(e.request, clone));
+        return res;
+      }).catch(() => caches.match(e.request))
     );
     return;
   }
 
-  // Cache-first for everything else
+  // Tutto il resto — cache-first
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;

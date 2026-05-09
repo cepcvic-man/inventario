@@ -677,11 +677,11 @@
     .avail-num.zero  { color: var(--danger); }
 
     /* ═══════════════════════════════════════════
-       DESKTOP WRAPPER (mobile-first centrato)
+       TABLET + DESKTOP — responsive & floating nav
     ═══════════════════════════════════════════ */
     @media (min-width: 481px) {
       body {
-        background: oklch(16% 0.04 155);
+        background: var(--bg-alt);
         display: flex;
         justify-content: center;
         align-items: flex-start;
@@ -690,22 +690,62 @@
         max-width: 480px;
         min-height: 100dvh;
         width: 100%;
-        box-shadow: 0 0 60px oklch(0% 0 0 / .5);
+        background: var(--bg);
+        border-left: 1px solid var(--border);
+        border-right: 1px solid var(--border);
       }
       #app-shell {
-        max-width: 480px;
+        max-width: 720px;
         width: 100%;
         min-height: 100dvh;
-        box-shadow: 0 0 60px oklch(0% 0 0 / .5);
+        background: var(--bg);
+        border-left: 1px solid var(--border);
+        border-right: 1px solid var(--border);
       }
+      /* pagine: padding extra per nav flottante */
+      .page { padding-bottom: 108px; }
+      /* floating pill nav */
       #bottom-nav {
+        bottom: 20px;
         left: 50%;
         transform: translateX(-50%);
-        max-width: 480px;
-        width: 480px;
+        width: auto;
+        min-width: min(420px, calc(100vw - 48px));
+        max-width: 580px;
+        height: auto;
+        padding: 6px 8px;
+        border-radius: 100px;
+        border: 1px solid var(--border);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        background: oklch(99% 0.002 75 / .88);
+        box-shadow: 0 8px 32px oklch(0% 0 0 / .14), 0 2px 6px oklch(0% 0 0 / .06);
       }
-      .fab { right: calc(50vw - 224px); }
-      #toast { left: calc(50vw - 224px); right: calc(50vw - 224px); }
+      .nav-tab {
+        flex: 0 1 auto;
+        padding: 8px 20px;
+        border-radius: 100px;
+        gap: 5px;
+      }
+      .nav-tab.active { background: var(--primary-soft); }
+      .nav-tab span { font-size: 12px; }
+      /* FAB sopra nav flottante */
+      .fab { bottom: calc(20px + 76px + 12px); }
+      /* action bar checklist sopra nav flottante */
+      #cl-action-bar {
+        bottom: calc(20px + 76px + 4px) !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        max-width: 720px;
+        width: 100%;
+      }
+      /* toast entro container */
+      #toast { left: 16px; right: 16px; bottom: calc(20px + 76px + 12px); max-width: 540px; margin: 0 auto; }
+    }
+    /* FAB e toast allineati al container a larghezze > 720px */
+    @media (min-width: 769px) {
+      .fab { right: calc(50vw - 344px); }
+      #toast { left: calc(50vw - 344px); right: calc(50vw - 344px); }
     }
   </style>
 </head>
