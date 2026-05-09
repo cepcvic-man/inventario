@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
   <title>CEPC Inventario</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2d6a4f">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CEPC">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
@@ -871,6 +880,13 @@
       </svg>
       <span>Admin</span>
     </button>
+    <button class="nav-tab hidden" id="btn-nav-profile" title="Profilo">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+      </svg>
+      <span>Profilo</span>
+    </button>
     <button class="nav-tab" id="btn-logout" title="Esci">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
            stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -944,6 +960,25 @@
       <button id="btn-check-fn-cancel" class="btn btn-ghost" style="flex:1">Annulla</button>
       <button id="btn-check-fn-confirm" class="btn btn-primary" style="flex:1">Conferma e invia</button>
     </div>
+  </div>
+</div>
+
+<!-- Modale dettaglio operatore -->
+<div id="modal-operator" class="modal-backdrop hidden">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="op-modal-name">–</div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px">
+      <div>
+        <div class="field-label">Congregazione</div>
+        <div id="op-modal-congregation" class="t-body">–</div>
+      </div>
+      <div>
+        <div class="field-label">Telefono</div>
+        <a id="op-modal-phone" href="#" class="t-body" style="color:var(--primary);text-decoration:none;font-weight:600">–</a>
+      </div>
+    </div>
+    <button class="btn btn-ghost" style="margin-top:18px;width:100%" onclick="document.getElementById('modal-operator').classList.add('hidden')">Chiudi</button>
   </div>
 </div>
 
@@ -1085,6 +1120,7 @@ async function dbGetRole(userId) {
   return data?.role ?? 'operator';
 }
 
+
 async function dbGetInventory() {
   const { data, error } = await sb.from('inventory_items')
     .select('*').order('sort_order');
@@ -1162,9 +1198,10 @@ async function dbUpsertRows(clId, rows) {
   const { error } = await sb.from('checklist_rows').upsert(upserts);
   if (error) throw error;
 
-  const { error: ce } = await sb.from('checklists').update({
-    updated_at: new Date().toISOString()
-  }).eq('id', clId);
+  // Aggiorna timestamp e registra operatore al primo salvataggio
+  const clUpdate = { updated_at: new Date().toISOString() };
+  if (S.role === 'operator') clUpdate.operator_id = S.session.user.id;
+  const { error: ce } = await sb.from('checklists').update(clUpdate).eq('id', clId);
   if (ce) throw ce;
 
   await dbJournal(clId, 'change', 'Righe aggiornate', null);
@@ -1196,20 +1233,30 @@ async function dbDeleteItem(id) {
 async function dbGetItemEngagements(itemId) {
   const { data: rows, error } = await sb
     .from('checklist_rows')
-    .select('checklist_id, out_qty, return_qty, checklists(id, title, status, created_at)')
+    .select('checklist_id, out_qty, return_qty, checklists(id, title, status, created_at, operator_id)')
     .eq('item_id', itemId)
     .gt('out_qty', 0);
   if (error) throw error;
-  return (rows || [])
-    .filter(r => r.checklists?.status === 'open')
-    .map(r => ({
-      cl_id:      r.checklists.id,
-      cl_title:   r.checklists.title,
-      cl_date:    r.checklists.created_at,
-      out_qty:    r.out_qty,
-      return_qty: r.return_qty || 0,
-      net:        r.out_qty - (r.return_qty || 0)
-    }));
+
+  const open = (rows || []).filter(r => r.checklists?.status === 'open');
+
+  // Carica e decifra profili unici degli operatori
+  const opIds = [...new Set(open.map(r => r.checklists.operator_id).filter(Boolean))];
+  const profiles = {};
+  await Promise.all(opIds.map(async uid => {
+    try { profiles[uid] = await dbGetProfile(uid); } catch(_) {}
+  }));
+
+  return open.map(r => ({
+    cl_id:       r.checklists.id,
+    cl_title:    r.checklists.title,
+    cl_date:     r.checklists.created_at,
+    out_qty:     r.out_qty,
+    return_qty:  r.return_qty || 0,
+    net:         r.out_qty - (r.return_qty || 0),
+    operator_id: r.checklists.operator_id,
+    operator:    profiles[r.checklists.operator_id] || null
+  }));
 }
 
 async function openItemEngagementsModal(itemId, itemName) {
@@ -1224,19 +1271,26 @@ async function openItemEngagementsModal(itemId, itemName) {
       body.innerHTML = '<div class="t-muted t-small" style="text-align:center;padding:20px">Nessun impegno attivo.</div>';
       return;
     }
-    body.innerHTML = engs.map(e => `
-      <div style="display:grid;grid-template-columns:1fr 40px 40px 40px;gap:4px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px">
+    const dtFmt = d => {
+      const dt = new Date(d);
+      return dt.toLocaleDateString('it-IT') + ' ' + dt.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+    };
+    body.innerHTML = engs.map(e => {
+      const opName = e.operator?.fullName
+        ? `<button class="btn-link" onclick="openOperatorModal('${e.operator_id}')" style="font-size:12px;color:var(--primary);background:none;border:none;padding:0;cursor:pointer;text-align:left">${esc(e.operator.fullName)}</button>`
+        : `<span class="t-meta">Operatore sconosciuto</span>`;
+      return `
+      <div style="display:grid;grid-template-columns:1fr 36px 36px 36px;gap:4px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px">
         <div>
           <div style="font-weight:600">${esc(e.cl_title)}</div>
-          <div class="t-meta">${new Date(e.cl_date).toLocaleDateString('it-IT')}</div>
+          <div class="t-meta">${dtFmt(e.cl_date)}</div>
+          <div style="margin-top:2px">${opName}</div>
         </div>
         <div style="text-align:right;font-variant-numeric:tabular-nums">${e.out_qty}</div>
         <div style="text-align:right;font-variant-numeric:tabular-nums;color:var(--success)">${e.return_qty}</div>
         <div style="text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:${e.net > 0 ? 'var(--primary)' : 'var(--text)'}">${e.net}</div>
-      </div>`).join('') +
-      `<div style="display:grid;grid-template-columns:1fr 40px 40px 40px;gap:4px;padding-top:8px;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.4px">
-        <div></div><div style="text-align:right">Usc.</div><div style="text-align:right">Rnt.</div><div style="text-align:right">Netto</div>
       </div>`;
+    }).join('');
   } catch(e) { body.innerHTML = `<div class="t-error t-small">${esc(e.message)}</div>`; }
 }
 
@@ -1351,6 +1405,31 @@ function openClDetail(clId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-cl-detail').classList.add('active');
   renderClDetail();
+}
+
+// ── Profilo operatore ───────────────────────────────────────
+const _opProfileCache = {};
+
+async function openOperatorModal(userId) {
+  let profile = _opProfileCache[userId];
+  if (!profile) {
+    try {
+      profile = await dbGetProfile(userId);
+      if (profile) _opProfileCache[userId] = profile;
+    } catch(e) { showToast('Errore caricamento profilo: ' + e.message, 'error'); return; }
+  }
+  if (!profile) { showToast('Profilo non disponibile.', 'error'); return; }
+  document.getElementById('op-modal-name').textContent         = profile.fullName  || '–';
+  document.getElementById('op-modal-congregation').textContent = profile.congregation || '–';
+  const phoneEl = document.getElementById('op-modal-phone');
+  if (profile.phone) {
+    phoneEl.textContent = profile.phone;
+    phoneEl.href        = `tel:${profile.phone.replace(/\s/g, '')}`;
+  } else {
+    phoneEl.textContent = '–';
+    phoneEl.href        = '#';
+  }
+  document.getElementById('modal-operator').classList.remove('hidden');
 }
 
 // ── Inventory edit (admin) ──────────────────────────────────
@@ -2022,6 +2101,10 @@ function wireEvents() {
     document.getElementById('modal-new-cl').classList.add('hidden')
   );
 
+  document.getElementById('btn-nav-profile')?.addEventListener('click', () =>
+    showProfileModal(null)
+  );
+
   document.getElementById('btn-logout').addEventListener('click', async () => {
     if (!confirm('Esci dall\'account?')) return;
     await sb.auth.signOut();
@@ -2153,7 +2236,7 @@ function wireEvents() {
   });
 
   // Backdrop click closes modals
-  ['modal-new-cl', 'modal-profile'].forEach(id => {
+  ['modal-new-cl', 'modal-profile', 'modal-item-eng', 'modal-operator', 'modal-edit-item', 'modal-check-fn'].forEach(id => {
     document.getElementById(id).addEventListener('click', e => {
       if (e.target === e.currentTarget)
         document.getElementById(id).classList.add('hidden');
@@ -2199,6 +2282,9 @@ async function onLoginSuccess() {
 
   S.inventoryItems = await dbGetInventory();
 
+  // Pulsante profilo solo per operatori
+  document.getElementById('btn-nav-profile').classList.toggle('hidden', S.role !== 'operator');
+
   // Operators must have a profile; show setup modal if missing
   if (S.role === 'operator') {
     S.operatorProfile = await dbGetProfile(S.session.user.id);
@@ -2238,6 +2324,14 @@ async function init() {
 }
 
 init().catch(console.error);
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(err => {
+      console.warn('SW registration failed:', err);
+    });
+  });
+}
 </script>
 </body>
 </html>
