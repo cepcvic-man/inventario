@@ -101,14 +101,16 @@
     #app-shell {
       display: flex;
       flex-direction: column;
-      min-height: 100dvh;
+      height: 100dvh;
+      overflow: hidden;
     }
 
     .page {
       display: none;
       flex-direction: column;
       flex: 1;
-      padding-bottom: calc(var(--nav-h) + var(--safe-bottom) + 16px);
+      overflow: hidden;
+      padding-bottom: 0;
     }
     .page.active { display: flex; }
 
@@ -152,6 +154,7 @@
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       overscroll-behavior-y: contain;
+      padding-bottom: calc(var(--nav-h) + var(--safe-bottom) + 16px);
     }
 
     .section {
@@ -725,13 +728,13 @@
       #app-shell {
         max-width: 720px;
         width: 100%;
-        min-height: 100dvh;
+        height: 100dvh;
         background: var(--bg);
         border-left: 1px solid var(--border);
         border-right: 1px solid var(--border);
       }
-      /* pagine: padding extra per nav flottante */
-      .page { padding-bottom: 108px; }
+      /* pagine: padding extra per nav flottante desktop */
+      .scroll-area { padding-bottom: 128px; }
       /* floating pill nav */
       #bottom-nav {
         bottom: 20px;
@@ -1478,7 +1481,7 @@ async function dbGetRole(userId) {
   const { data } = await sb.from('user_roles')
     .select('role,scope_groups,scope_checklist,scope_valid_until')
     .eq('user_id', userId).single();
-  return data == { role: 'operator', scope_groups: null, scope_checklist: true, scope_valid_until: null };
+  return data ?? { role: 'operator', scope_groups: null, scope_checklist: true, scope_valid_until: null };
 }
 
 
