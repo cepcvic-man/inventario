@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="UTF-8">
@@ -17,9 +17,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
   <style>
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ==================================================
        DESIGN SYSTEM
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ================================================== */
     :root {
       --bg:          oklch(97.5% 0.006 75);
       --bg-alt:      oklch(94%   0.010 75);
@@ -84,9 +84,9 @@
     .hidden { display: none !important; }
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ==================================================
        TYPOGRAPHY
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ================================================== */
     .t-title { font-size: 22px; font-weight: 700; letter-spacing: 0; }
     .t-h2    { font-size: 18px; font-weight: 600; letter-spacing: 0; }
     .t-h3    { font-size: 15px; font-weight: 600; }
@@ -95,9 +95,9 @@
     .t-meta  { font-size: 13px; color: var(--text-3); }
     .t-muted { color: var(--text-2); }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ==================================================
        LAYOUT
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ================================================== */
     #app-shell {
       display: flex;
       flex-direction: column;
@@ -166,9 +166,9 @@
       margin-bottom: 10px;
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ==================================================
        CARDS
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ================================================== */
     .card {
       background: var(--surface);
       border-radius: var(--radius);
@@ -193,9 +193,9 @@
       box-shadow: var(--shadow-sm);
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ==================================================
        BADGES
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ================================================== */
     .badge {
       display: inline-flex;
       align-items: center;
@@ -222,9 +222,9 @@
       border-radius: 100px;
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ==================================================
        BOTTOM NAVIGATION
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ================================================== */
     #bottom-nav {
       position: fixed;
       bottom: 0;
@@ -264,9 +264,9 @@
       margin-left: 14px;
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ==================================================
        FORMS / INPUTS
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ================================================== */
     .form-group { margin-bottom: 16px; }
     .form-label {
       display: block;
@@ -344,9 +344,9 @@
     input[type=number]::-webkit-outer-spin-button,
     input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ==================================================
        BUTTONS
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ================================================== */
     .btn {
       display: inline-flex;
       align-items: center;
@@ -383,7 +383,7 @@
     .icon-btn-danger { color: var(--danger); }
     .icon-btn-danger:hover { background: rgba(239,68,68,.12); }
 
-    /* â”€â”€ Toggle switch â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Toggle switch ─────────────────────── */
     .toggle-track {
       width: 56px; height: 48px;
       background: var(--border);
@@ -405,7 +405,7 @@
     }
     .toggle-track.on .toggle-thumb { transform: translateX(20px); }
 
-    /* â”€â”€ Check funzionamento modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Check funzionamento modal ─────────── */
     .check-radio-label { transition: background .15s, color .15s, border-color .15s; }
 
     .fab {
@@ -425,9 +425,9 @@
     .fab:active { opacity: .86; }
     .fab svg { width: 24px; height: 24px; }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ==================================================
        DIVIDER / LIST
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ================================================== */
     .list-row {
       display: flex;
       align-items: center;
@@ -440,9 +440,9 @@
     .list-row:last-child  { border-radius: 0 0 var(--radius) var(--radius); border-bottom: none; }
     .list-row:only-child  { border-radius: var(--radius); border-bottom: none; }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ==================================================
        TOAST / SNACKBAR
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ================================================== */
     #toast {
       position: fixed;
       bottom: calc(var(--nav-h) + var(--safe-bottom) + 12px);
@@ -465,9 +465,9 @@
     #toast.error { background: var(--danger); }
     #toast.success { background: var(--success); }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ==================================================
        LOADING OVERLAY
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ================================================== */
     #loading-overlay {
       position: fixed;
       inset: 0;
@@ -484,9 +484,9 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ==================================================
        MODAL / SHEET
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ================================================== */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -518,11 +518,11 @@
     }
     .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
 
-    /* stat grid removed â€” replaced by home-header + checklist list */
+    /* stat grid removed — replaced by home-header + checklist list */
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ==================================================
        INVENTORY SECTION GROUPS
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ================================================== */
     .inv-section-header {
       display: flex;
       align-items: center;
@@ -548,9 +548,9 @@
     .inv-item-name { font-size: 16px; font-weight: 600; color: var(--text); }
     .inv-item-meta { font-size: 14px; color: var(--text-2); margin-top: 4px; }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ==================================================
        CHECKLIST DETAIL ROW
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ================================================== */
     .cl-row {
       background: var(--surface);
       border: 2px solid var(--border);
@@ -620,9 +620,9 @@
     }
     .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); outline: none; }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ==================================================
        EMPTY STATE
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ================================================== */
     .empty-state {
       display: flex;
       flex-direction: column;
@@ -634,9 +634,9 @@
     }
     .empty-state svg { color: var(--text-3); width: 48px; height: 48px; }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ==================================================
        LOGIN
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ================================================== */
     #page-login {
       min-height: 100dvh;
       display: flex;
@@ -704,9 +704,9 @@
     .avail-num.avail { color: var(--success); }
     .avail-num.zero  { color: var(--danger); }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       TABLET + DESKTOP â€” responsive & floating nav
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    /* ==================================================
+       TABLET + DESKTOP — responsive & floating nav
+    ================================================== */
     @media (min-width: 481px) {
       body {
         background: var(--bg-alt);
@@ -786,9 +786,9 @@
 </head>
 <body>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+<!-- ==================================================
      LOGIN SCREEN
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+================================================== -->
 <div id="page-login">
   <div class="login-logo">
     <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none"
@@ -810,7 +810,7 @@
     </div>
     <div class="form-group">
       <label class="form-label" for="inp-pass">Password</label>
-      <input id="inp-pass" type="password" class="form-control" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" autocomplete="current-password">
+      <input id="inp-pass" type="password" class="form-control" placeholder="••••••••" autocomplete="current-password">
     </div>
     <button id="btn-login" class="btn btn-primary btn-block" style="margin-top:8px">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -821,20 +821,20 @@
       Accedi
     </button>
   </div>
-  <div class="t-meta" style="margin-top:24px;text-align:center">CEPC Â· Vicenza Â· 2026</div>
+  <div class="t-meta" style="margin-top:24px;text-align:center">CEPC · Vicenza · 2026</div>
 </div>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+<!-- ==================================================
      APP SHELL (visible after login)
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+================================================== -->
 <div id="app-shell" class="hidden">
 
-  <!-- â”€â”€ HOME â”€â”€ -->
+  <!-- ── HOME ── -->
   <div id="page-home" class="page active">
     <div class="home-header">
       <div class="t-meta" style="margin-bottom:4px">Congresso Vicenza 2026</div>
       <div class="t-title">Inventario CEPC</div>
-      <div class="t-small t-muted" id="home-subtitle" style="margin-top:6px">â€“</div>
+      <div class="t-small t-muted" id="home-subtitle" style="margin-top:6px">–</div>
     </div>
     <div class="scroll-area">
       <div class="section">
@@ -844,11 +844,11 @@
     </div>
   </div>
 
-  <!-- â”€â”€ CHECKLISTS â”€â”€ -->
+  <!-- ── CHECKLISTS ── -->
   <div id="page-checklists" class="page">
     <div class="page-header">
       <div class="t-title">Checklist</div>
-      <div class="t-small t-muted" id="cl-count-label">â€“</div>
+      <div class="t-small t-muted" id="cl-count-label">–</div>
     </div>
     <div class="scroll-area" id="cl-list-area">
       <div style="height:12px"></div>
@@ -862,7 +862,7 @@
     </button>
   </div>
 
-  <!-- â”€â”€ CHECKLIST DETAIL â”€â”€ -->
+  <!-- ── CHECKLIST DETAIL ── -->
   <div id="page-cl-detail" class="page">
     <div class="page-header">
       <div class="page-header-row">
@@ -873,7 +873,7 @@
           </svg>
         </button>
         <div style="flex:1;min-width:0">
-          <div class="t-h2" id="cl-detail-title" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">â€“</div>
+          <div class="t-h2" id="cl-detail-title" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">–</div>
           <div id="cl-detail-badge" style="margin-top:4px"></div>
         </div>
         <button class="back-btn hidden" id="btn-cl-reset" aria-label="Annulla modifiche non salvate"
@@ -896,7 +896,7 @@
     </div>
     <!-- Operator info bar -->
     <div id="cl-operator-bar" style="padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border)">
-      <div class="t-small t-muted" id="cl-operator-text">â€“</div>
+      <div class="t-small t-muted" id="cl-operator-text">–</div>
     </div>
     <!-- Search -->
     <div class="search-bar">
@@ -905,7 +905,7 @@
              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
         </svg>
-        <input id="cl-search" class="search-input" type="search" placeholder="Cerca articoloâ€¦">
+        <input id="cl-search" class="search-input" type="search" placeholder="Cerca articolo…">
       </div>
     </div>
     <!-- Phase selector -->
@@ -925,12 +925,12 @@
     </div>
   </div>
 
-  <!-- â”€â”€ INVENTARIO â”€â”€ -->
+  <!-- ── INVENTARIO ── -->
   <div id="page-inventory" class="page">
     <div class="page-header">
       <div class="t-title">Inventario</div>
       <div style="display:flex;align-items:center;gap:8px">
-        <div class="t-small t-muted" id="inv-count-label">â€“</div>
+        <div class="t-small t-muted" id="inv-count-label">–</div>
         <button id="btn-new-item" class="btn btn-sm btn-primary hidden" onclick="openEditItemModal(null)">+ Articolo</button>
       </div>
     </div>
@@ -940,7 +940,7 @@
              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
         </svg>
-        <input id="inv-search" class="search-input" type="search" placeholder="Cerca articoloâ€¦">
+        <input id="inv-search" class="search-input" type="search" placeholder="Cerca articolo…">
       </div>
     </div>
     <div class="scroll-area" id="inv-list-area">
@@ -948,7 +948,7 @@
     </div>
   </div>
 
-  <!-- â”€â”€ ADMIN â”€â”€ -->
+  <!-- ── ADMIN ── -->
   <div id="page-admin" class="page">
     <div class="page-header">
       <div class="t-title">Admin</div>
@@ -957,7 +957,7 @@
     <div class="scroll-area">
       <!-- Availability -->
       <div class="section">
-        <div class="section-label">DisponibilitÃ  articoli</div>
+        <div class="section-label">Disponibilità articoli</div>
         <div id="admin-avail" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden"></div>
       </div>
       <!-- Checklist admin actions -->
@@ -981,11 +981,11 @@
     </div>
   </div>
 
-  <!-- â”€â”€ PROFILO â”€â”€ -->
+  <!-- ── PROFILO ── -->
   <div id="page-profile" class="page">
     <div class="page-header">
       <div class="t-title">Profilo</div>
-      <div class="t-small t-muted" id="profile-email-label">â€“</div>
+      <div class="t-small t-muted" id="profile-email-label">–</div>
     </div>
     <div class="scroll-area">
       <div class="section">
@@ -1032,7 +1032,7 @@
     </div>
   </div>
 
-  <!-- â”€â”€ BOTTOM NAV â”€â”€ -->
+  <!-- ── BOTTOM NAV ── -->
   <nav id="bottom-nav">
     <button class="nav-tab active" data-tab="home">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
@@ -1084,9 +1084,9 @@
 
 </div><!-- /app-shell -->
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+<!-- ==================================================
      MODALS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+================================================== -->
 
 <!-- New Checklist Modal (solo admin) -->
 <div id="modal-new-cl" class="modal-backdrop hidden">
@@ -1104,7 +1104,7 @@
   </div>
 </div>
 
-<!-- Profilo operatore â€” setup prima volta -->
+<!-- Profilo operatore — setup prima volta -->
 <div id="modal-profile" class="modal-backdrop hidden">
   <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="modal-profile-title">
     <div class="modal-handle"></div>
@@ -1152,9 +1152,9 @@
   </button>
 </div>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+<!-- ==================================================
      SCRIPTS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+================================================== -->
 <!-- Reset checklist -->
 <div id="modal-reset-cl" class="modal-backdrop hidden">
   <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="modal-reset-title">
@@ -1214,15 +1214,15 @@
 <div id="modal-operator" class="modal-backdrop hidden">
   <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="op-modal-name">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="op-modal-name">â€“</div>
+    <div class="modal-title" id="op-modal-name">–</div>
     <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px">
       <div>
         <div class="field-label">Congregazione</div>
-        <div id="op-modal-congregation" class="t-body">â€“</div>
+        <div id="op-modal-congregation" class="t-body">–</div>
       </div>
       <div>
         <div class="field-label">Telefono</div>
-        <a id="op-modal-phone" href="#" class="t-body" style="color:var(--primary);text-decoration:none;font-weight:600">â€“</a>
+        <a id="op-modal-phone" href="#" class="t-body" style="color:var(--primary);text-decoration:none;font-weight:600">–</a>
       </div>
     </div>
     <button id="btn-operator-close" class="btn btn-ghost" style="margin-top:18px;width:100%" onclick="closeModal('modal-operator')">Chiudi</button>
@@ -1259,7 +1259,7 @@
           <input id="edit-item-group" class="text-input" type="text" placeholder="es. Vicenza">
         </div>
         <div style="width:100px">
-          <div class="field-label">QuantitÃ </div>
+          <div class="field-label">Quantità</div>
           <input id="edit-item-qty" class="text-input" type="number" min="0" placeholder="0">
         </div>
       </div>
@@ -1280,29 +1280,29 @@
 <script>
 'use strict';
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// CONFIG â€” modifica prima del deploy
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ==================================================
+// CONFIG — modifica prima del deploy
+// ==================================================
 const SUPABASE_URL  = 'https://numpwzhfmusaagjiqkoc.supabase.co';
 const SUPABASE_ANON = 'sb_publishable_DEEZJz95_A0OJdcqOta29A_zmVBfCiJ';
 const ENCRYPT_PASS  = 'VicenzaCEPCInventarioFormia2026';
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ==================================================
 
-// â”€â”€ Supabase client â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Supabase client ─────────────────────────────────────────
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-// ── Admin client (service role — bypassa RLS per creare/cancellare utenti) ──
-// Ottieni da: Supabase Dashboard → Settings → API → service_role key
+// == Admin client (service role � bypassa RLS per creare/cancellare utenti) ==
+// Ottieni da: Supabase Dashboard ? Settings ? API ? service_role key
 const SUPABASE_SERVICE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51bXB3emhmbXVzYWFnamlxa29jIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3ODI1NTU3MiwiZXhwIjoyMDkzODMxNTcyfQ.jhnqrzeM3P7EkyI8qGtc1eWTTDAKXuSVmz0xiv_nEkg";
 const sb_admin = supabase.createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
   auth: { autoRefreshToken: false, persistSession: false }
 });
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ==================================================
 // ENCRYPTION  (AES-256-GCM via Web Crypto API)
 // Protegge i dati personali dell'operatore nei dump DB.
-// La chiave Ã¨ derivata da ENCRYPT_PASS con PBKDF2.
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// La chiave è derivata da ENCRYPT_PASS con PBKDF2.
+// ==================================================
 const ENC_SALT = new Uint8Array([
   0xCE,0x50,0xC7,0x1A,0x82,0x3F,0x6B,0xD4,
   0x91,0x5E,0x2C,0xA7,0x08,0xF3,0x44,0xBB
@@ -1350,9 +1350,9 @@ async function dec(s) {
   } catch { return null; }
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ==================================================
 // APP STATE
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ==================================================
 const S = {
   session:        null,
   role:           null,     // 'operator' | 'admin'
@@ -1364,8 +1364,8 @@ const S = {
   currentCl:      null,     // testata checklist aperta
   operatorProfile: null,    // {fullName, congregation, phone} decifrato dal DB
   clPhase:         'out',   // 'out' | 'return'
-  submittedFloor:  {},      // { item_id: {out_qty, return_qty} } â€” floor dopo submit
-  dbBaseline:      {},      // { item_id: {out_qty, return_qty} } â€” valori DB all'ultimo render/reset
+  submittedFloor:  {},      // { item_id: {out_qty, return_qty} } — floor dopo submit
+  dbBaseline:      {},      // { item_id: {out_qty, return_qty} } — valori DB all'ultimo render/reset
   visibleRowIds:   [],
 };
 
@@ -1454,7 +1454,7 @@ function handleModalKeydown(e) {
   }
 }
 
-function friendlyError(err, fallback = 'Si e verificato un problema. Riprova.') {
+function friendlyError(err, fallback = 'Si è verificato un problema. Riprova.') {
   const msg = String(err?.message || '').toLowerCase();
   if (!navigator.onLine || msg.includes('failed to fetch') || msg.includes('network') || msg.includes('fetch')) {
     return 'Connessione assente. Controlla la rete e riprova.';
@@ -1471,14 +1471,14 @@ function friendlyError(err, fallback = 'Si e verificato un problema. Riprova.') 
   return fallback;
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ==================================================
 // DB HELPERS
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ==================================================
 async function dbGetRole(userId) {
   const { data } = await sb.from('user_roles')
     .select('role,scope_groups,scope_checklist,scope_valid_until')
     .eq('user_id', userId).single();
-  return data ?? { role: 'operator', scope_groups: null, scope_checklist: true, scope_valid_until: null };
+  return data == { role: 'operator', scope_groups: null, scope_checklist: true, scope_valid_until: null };
 }
 
 
@@ -1624,7 +1624,7 @@ async function openItemEngagementsModal(itemId, itemName) {
   const modal = document.getElementById('modal-item-eng');
   const body  = document.getElementById('item-eng-body');
   document.getElementById('item-eng-title').textContent = itemName;
-  body.innerHTML = '<div class="t-muted t-small" style="text-align:center;padding:20px">Caricamentoâ€¦</div>';
+  body.innerHTML = '<div class="t-muted t-small" style="text-align:center;padding:20px">Caricamento…</div>';
   openModal('modal-item-eng', '#btn-item-eng-close');
   try {
     const engs = await dbGetItemEngagements(itemId);
@@ -1722,9 +1722,9 @@ async function dbGetAvailability() {
   }));
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ==================================================
 // UI UTILITIES
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ==================================================
 function showLoading(v) {
   document.getElementById('loading-overlay').classList.toggle('hidden', !v);
 }
@@ -1771,7 +1771,7 @@ function openClDetail(clId) {
   renderClDetail();
 }
 
-// â”€â”€ Profilo operatore â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Profilo operatore ───────────────────────────────────────
 const _opProfileCache = {};
 
 async function openOperatorModal(userId) {
@@ -1783,27 +1783,27 @@ async function openOperatorModal(userId) {
     } catch(e) { showToast(friendlyError(e, 'Impossibile caricare il profilo.'), 'error'); return; }
   }
   if (!profile) { showToast('Profilo non disponibile.', 'error'); return; }
-  document.getElementById('op-modal-name').textContent         = profile.fullName  || 'â€“';
-  document.getElementById('op-modal-congregation').textContent = profile.congregation || 'â€“';
+  document.getElementById('op-modal-name').textContent         = profile.fullName  || '–';
+  document.getElementById('op-modal-congregation').textContent = profile.congregation || '–';
   const phoneEl = document.getElementById('op-modal-phone');
   if (profile.phone) {
     phoneEl.textContent = profile.phone;
     phoneEl.href        = `tel:${profile.phone.replace(/\s/g, '')}`;
   } else {
-    phoneEl.textContent = 'â€“';
+    phoneEl.textContent = '–';
     phoneEl.href        = '#';
   }
   openModal('modal-operator', '#btn-operator-close');
 }
 
-// â”€â”€ Inventory edit (admin) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Inventory edit (admin) ──────────────────────────────────
 function openEditItemModal(itemId) {
   const item = itemId ? S.inventoryItems.find(i => i.id === itemId) : null;
   document.getElementById('modal-edit-item-title').textContent = item ? 'Modifica articolo' : 'Nuovo articolo';
   document.getElementById('edit-item-id').value    = item?.id    || '';
   document.getElementById('edit-item-desc').value  = item?.description || '';
   document.getElementById('edit-item-group').value = item?.group || '';
-  document.getElementById('edit-item-qty').value   = item?.quantity ?? 0;
+  document.getElementById('edit-item-qty').value   = item?.quantity == 0;
   document.getElementById('edit-item-notes').value = item?.notes || '';
   openModal('modal-edit-item', '#edit-item-desc');
 }
@@ -1811,7 +1811,7 @@ function openEditItemModal(itemId) {
 async function confirmDeleteItem(itemId) {
   const item = S.inventoryItems.find(i => i.id === itemId);
   if (!item) return;
-  if (!confirm(`Eliminare "${item.description}"? L'azione Ã¨ irreversibile.`)) return;
+  if (!confirm(`Eliminare "${item.description}"? L'azione è irreversibile.`)) return;
   showLoading(true);
   try {
     await dbDeleteItem(itemId);
@@ -1850,11 +1850,11 @@ function openSubmitConfirmModal(pendingChecks) {
       const parts = [];
       if (outDiff !== 0) {
         const sign = outDiff > 0 ? '+' : '';
-        parts.push(`<span>Uscite: <b>${base.out_qty} â†’ ${row.out_qty || 0}</b> <span style="color:${outDiff>0?'var(--danger)':'var(--success)'}">(${sign}${outDiff})</span></span>`);
+        parts.push(`<span>Uscite: <b>${base.out_qty} → ${row.out_qty || 0}</b> <span style="color:${outDiff>0?'var(--danger)':'var(--success)'}">(${sign}${outDiff})</span></span>`);
       }
       if (retDiff !== 0) {
         const sign = retDiff > 0 ? '+' : '';
-        parts.push(`<span>Rientri: <b>${base.return_qty} â†’ ${row.return_qty || 0}</b> <span style="color:${retDiff>0?'var(--success)':'var(--danger)'}">(${sign}${retDiff})</span></span>`);
+        parts.push(`<span>Rientri: <b>${base.return_qty} → ${row.return_qty || 0}</b> <span style="color:${retDiff>0?'var(--success)':'var(--danger)'}">(${sign}${retDiff})</span></span>`);
       }
       return `<div style="padding:10px 12px;background:var(--surface-alt);border-radius:var(--radius-sm);display:flex;flex-direction:column;gap:4px">
         <div class="t-body" style="font-weight:600">${name}</div>
@@ -1936,7 +1936,7 @@ async function resetClTotal() {
   closeResetModal();
   showLoading(true);
   try {
-    // Upsert floor values â€” se non c'Ã¨ floor usa 0, non cancella mai la checklist
+    // Upsert floor values — se non c'è floor usa 0, non cancella mai la checklist
     const upserts = S.inventoryItems.map(item => {
       const f = S.submittedFloor[item.id] || { out_qty: 0, return_qty: 0 };
       return { checklist_id: S.currentClId, item_id: item.id, out_qty: f.out_qty, return_qty: f.return_qty, updated_at: new Date().toISOString() };
@@ -2032,12 +2032,12 @@ function returnAllVisibleRows() {
 }
 
 function fmtDate(iso) {
-  if (!iso) return 'â€“';
+  if (!iso) return '–';
   return new Date(iso).toLocaleDateString('it-IT', { day:'2-digit', month:'short', year:'2-digit' });
 }
 
 function fmtDateTime(iso) {
-  if (!iso) return 'â€“';
+  if (!iso) return '–';
   const d = new Date(iso);
   return d.toLocaleDateString('it-IT', { day:'2-digit', month:'2-digit', year:'2-digit' }) +
     ' ' + d.toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' });
@@ -2094,9 +2094,9 @@ function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// RENDER â€” HOME
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ==================================================
+// RENDER — HOME
+// ==================================================
 async function renderHome() {
   showLoading(true);
   try {
@@ -2111,8 +2111,8 @@ async function renderHome() {
 
     document.getElementById('home-subtitle').textContent =
       open === 0
-        ? `${items.length} articoli Â· nessuna checklist aperta`
-        : `${items.length} articoli Â· ${open} checklist ${open === 1 ? 'aperta' : 'aperte'}`;
+        ? `${items.length} articoli · nessuna checklist aperta`
+        : `${items.length} articoli · ${open} checklist ${open === 1 ? 'aperta' : 'aperte'}`;
 
     const recent = cls.slice(0, 5);
     const el = document.getElementById('home-recent');
@@ -2136,9 +2136,9 @@ async function renderHome() {
   } finally { showLoading(false); }
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// RENDER â€” CHECKLISTS LIST
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ==================================================
+// RENDER — CHECKLISTS LIST
+// ==================================================
 async function renderChecklists() {
   showLoading(true);
   try {
@@ -2169,7 +2169,7 @@ async function renderChecklists() {
         <div style="flex:1;min-width:0">
           <div class="t-h3" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.title)}</div>
           <div class="t-meta" style="margin-top:2px">
-            ${fmtDate(c.created_at)}${c.submitted_at ? ' Â· inviata ' + fmtDate(c.submitted_at) : ''}
+            ${fmtDate(c.created_at)}${c.submitted_at ? ' · inviata ' + fmtDate(c.submitted_at) : ''}
           </div>
         </div>
         ${statusBadge(c)}
@@ -2183,9 +2183,9 @@ async function renderChecklists() {
   } finally { showLoading(false); }
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// RENDER â€” CHECKLIST DETAIL
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ==================================================
+// RENDER — CHECKLIST DETAIL
+// ==================================================
 async function renderClDetail() {
   showLoading(true);
   try {
@@ -2198,7 +2198,7 @@ async function renderClDetail() {
     ]);
     S.currentCl = cl;
 
-    // QuantitÃ  nette impegnate in ALTRE checklist aperte (per calcolare disponibilitÃ  reale)
+    // Quantità nette impegnate in ALTRE checklist aperte (per calcolare disponibilità reale)
     const { data: openCls } = await sb.from('checklists')
       .select('id').eq('status', 'open').neq('id', S.currentClId);
     const otherOpenIds = (openCls || []).map(c => c.id);
@@ -2221,7 +2221,7 @@ async function renderClDetail() {
     });
     S.currentClRows = Object.values(rowMap);
 
-    // Snapshot baseline (sempre) e floor (solo se giÃ  inviata)
+    // Snapshot baseline (sempre) e floor (solo se già inviata)
     S.dbBaseline     = {};
     S.submittedFloor = {};
     S.currentClRows.forEach(r => {
@@ -2233,13 +2233,13 @@ async function renderClDetail() {
     document.getElementById('cl-detail-title').textContent = cl.title;
     document.getElementById('cl-detail-badge').innerHTML   = statusBadge(cl);
 
-    // Operator bar: show current user's profile (operator) or "â€“" (admin view)
+    // Operator bar: show current user's profile (operator) or "–" (admin view)
     const opBar = document.getElementById('cl-operator-text');
     if (S.role === 'operator' && S.operatorProfile) {
       const p = S.operatorProfile;
-      opBar.textContent = `${p.fullName} Â· ${p.congregation}${p.phone ? ' Â· ' + p.phone : ''}`;
+      opBar.textContent = `${p.fullName} · ${p.congregation}${p.phone ? ' · ' + p.phone : ''}`;
     } else {
-      opBar.textContent = 'â€“';
+      opBar.textContent = '–';
     }
 
     const isClosed = cl.status === 'closed';
@@ -2303,7 +2303,7 @@ function buildClRows(filter) {
       <span class="t-meta" style="margin-left:auto">${entries.length} articoli</span>
     </div>`;
     entries.forEach(({ row, item }) => {
-      const hasChanges = S.sessionDirty?.has(row.item_id) ?? false;
+      const hasChanges = S.sessionDirty?.has(row.item_id) == false;
       const availForThis = Math.max(0, item.quantity - (S.otherClNet?.[item.id] || 0));
       const metaParts = [phase === 'out'
         ? `Disponibile: ${availForThis}`
@@ -2320,13 +2320,13 @@ function buildClRows(filter) {
       html += `<div class="cl-row ${hasChanges ? 'has-changes' : ''}" data-item="${item.id}">
         <div class="cl-row-info">
           <div class="cl-row-name">${esc(itemName(item.description))}</div>
-          <div class="cl-row-meta">${metaParts.join(' Â· ')}</div>
+          <div class="cl-row-meta">${metaParts.join(' · ')}</div>
           ${hasChanges ? '<div class="cl-row-dirty-flag">Modificato</div>' : ''}
         </div>
         <div class="cl-qty-wrap">
           <div class="cl-qty-label">${label}</div>
           <div class="qty-row">
-            <button class="qty-btn" data-action="dec" data-field="${field}" data-item="${item.id}" ${readonly?'disabled':''}>âˆ’</button>
+            <button class="qty-btn" data-action="dec" data-field="${field}" data-item="${item.id}" ${readonly?'disabled':''}>−</button>
             <input class="qty-input" type="number" min="${minVal}" max="${maxVal}"
                    value="${val}" data-field="${field}" data-item="${item.id}"
                    ${readonly?'readonly':''}>
@@ -2361,7 +2361,7 @@ function buildClRows(filter) {
       const input = area.querySelector(`input[data-field="${field}"][data-item="${itemId}"]`);
       if (input) input.value = val;
       const card = btn.closest('.cl-row');
-      if (card) card.classList.toggle('has-changes', S.sessionDirty?.has(itemId) ?? false);
+      if (card) card.classList.toggle('has-changes', S.sessionDirty?.has(itemId) == false);
     });
   });
 
@@ -2382,15 +2382,15 @@ function buildClRows(filter) {
         input.value = v;
         updateDirty(itemId);
         const card = area.querySelector(`.cl-row[data-item="${itemId}"]`);
-        if (card) card.classList.toggle('has-changes', S.sessionDirty?.has(itemId) ?? false);
+        if (card) card.classList.toggle('has-changes', S.sessionDirty?.has(itemId) == false);
       }
     });
   });
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// RENDER â€” INVENTORY
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ==================================================
+// RENDER — INVENTORY
+// ==================================================
 async function renderInventory() {
   showLoading(true);
   try {
@@ -2429,7 +2429,7 @@ function buildInvList(filter) {
         <div style="display:flex;align-items:flex-start;gap:8px">
           <div style="flex:1;min-width:0">
             <div class="inv-item-name">${esc(itemName(item.description))}</div>
-            ${item.notes ? `<div class="inv-item-meta">${esc(item.notes.substring(0,80))}${item.notes.length>80?'â€¦':''}</div>` : ''}
+            ${item.notes ? `<div class="inv-item-meta">${esc(item.notes.substring(0,80))}${item.notes.length>80?'…':''}</div>` : ''}
           </div>
           <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
             <span class="badge badge-neutral">${item.quantity}</span>
@@ -2453,9 +2453,9 @@ function buildInvList(filter) {
   el.innerHTML = html;
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ==================================================
 // USER MANAGEMENT
-// ══════════════════════════════════════════════════════════════════
+// ==================================================
 const _WORDLIST = ['mare','monte','vento','fiume','terra','cielo','rocca','forza','luce','lago','torre','porta','bosco','campo','pietra'];
 const _SYMBOLS  = '!@#$%&*';
 
@@ -2507,40 +2507,40 @@ async function dbDeleteManagedUser(userId) {
 function renderUserManagement(users) {
   const el = document.getElementById('admin-users-list');
   if (!users.length) {
-    el.innerHTML = '<div class=”card t-muted t-small” style=”text-align:center;padding:20px”>Nessun utente creato.</div>';
+    el.innerHTML = '<div class=�card t-muted t-small� style=�text-align:center;padding:20px�>Nessun utente creato.</div>';
     return;
   }
   const roleBadge = r => r === 'admin'
-    ? '<span class=”badge” style=”background:#FEF2F2;color:#991B1B;border:1px solid #FECACA”>Admin</span>'
-    : '<span class=”badge badge-neutral”>Operatore</span>';
+    ? '<span class=�badge� style=�background:#FEF2F2;color:#991B1B;border:1px solid #FECACA�>Admin</span>'
+    : '<span class=�badge badge-neutral�>Operatore</span>';
 
   const scopeInfo = u => {
     const parts = [];
     if (u.scope_groups?.length)       parts.push('Gruppi: ' + u.scope_groups.join(', '));
     if (u.scope_checklist === false)   parts.push('No checklist');
     if (u.scope_valid_until)          parts.push('Scade: ' + u.scope_valid_until);
-    return parts.length ? parts.join(' · ') : 'Accesso completo';
+    return parts.length ? parts.join(' � ') : 'Accesso completo';
   };
 
-  el.innerHTML = '<div style=”background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden”>' +
+  el.innerHTML = '<div style=�background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden�>' +
     users.map(u => `
-    <div class=”list-row” style=”flex-direction:column;align-items:stretch;gap:6px”>
-      <div style=”display:flex;align-items:center;gap:8px”>
+    <div class=�list-row� style=�flex-direction:column;align-items:stretch;gap:6px�>
+      <div style=�display:flex;align-items:center;gap:8px�>
         ${roleBadge(u.role)}
-        <span class=”t-h3” style=”flex:1”>${esc(u.display_name || '—')}</span>
-        <button class=”icon-btn icon-btn-danger” title=”Elimina utente” data-uid=”${esc(u.user_id)}”>
-          <svg xmlns=”http://www.w3.org/2000/svg” viewBox=”0 0 24 24” fill=”none” stroke=”currentColor” stroke-width=”2” stroke-linecap=”round” stroke-linejoin=”round”>
-            <path d=”M3 6h18”/><path d=”M8 6V4h8v2”/><path d=”M19 6l-1 14H6L5 6”/>
+        <span class=�t-h3� style=�flex:1�>${esc(u.display_name || '�')}</span>
+        <button class=�icon-btn icon-btn-danger� title=�Elimina utente� data-uid=�${esc(u.user_id)}�>
+          <svg xmlns=�http://www.w3.org/2000/svg� viewBox=�0 0 24 24� fill=�none� stroke=�currentColor� stroke-width=�2� stroke-linecap=�round� stroke-linejoin=�round�>
+            <path d=�M3 6h18�/><path d=�M8 6V4h8v2�/><path d=�M19 6l-1 14H6L5 6�/>
           </svg>
         </button>
       </div>
-      <div style=”display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px”>
-        <span class=”t-muted”>Email:</span>
-        <code style=”background:#F1F5F9;padding:1px 6px;border-radius:4px”>${esc((u.display_name||'').toLowerCase().replace(/\s+/g,'.')+'@cepc.app')}</code>
-        <span class=”t-muted” style=”margin-left:6px”>Password:</span>
-        <code style=”background:#F0FDF4;border:1px solid #BBF7D0;padding:1px 8px;border-radius:4px;font-size:13px;font-weight:700;letter-spacing:0.5px;color:#166534”>${esc(u.plain_password || '—')}</code>
+      <div style=�display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px�>
+        <span class=�t-muted�>Email:</span>
+        <code style=�background:#F1F5F9;padding:1px 6px;border-radius:4px�>${esc((u.display_name||'').toLowerCase().replace(/\s+/g,'.')+'@cepc.app')}</code>
+        <span class=�t-muted� style=�margin-left:6px�>Password:</span>
+        <code style=�background:#F0FDF4;border:1px solid #BBF7D0;padding:1px 8px;border-radius:4px;font-size:13px;font-weight:700;letter-spacing:0.5px;color:#166534�>${esc(u.plain_password || '�')}</code>
       </div>
-      ${u.role === 'operator' ? `<div class=”t-meta”>${esc(scopeInfo(u))}</div>` : ''}
+      ${u.role === 'operator' ? `<div class=�t-meta�>${esc(scopeInfo(u))}</div>` : ''}
     </div>`).join('') + '</div>';
 
   el.querySelectorAll('[data-uid]').forEach(btn => {
@@ -2551,7 +2551,7 @@ function renderUserManagement(users) {
         await dbDeleteManagedUser(btn.dataset.uid);
         showToast('Utente eliminato.', 'success');
         await renderAdmin();
-      } catch(e) { showToast(friendlyError(e, “Impossibile eliminare l'utente.”), 'error'); }
+      } catch(e) { showToast(friendlyError(e, �Impossibile eliminare l'utente.�), 'error'); }
       finally { showLoading(false); }
     });
   });
@@ -2574,8 +2574,8 @@ function openNewUserModal() {
 
   const groups = [...new Set(S.inventoryItems.map(i => i.group).filter(Boolean))].sort();
   document.getElementById('nu-groups-list').innerHTML = groups.map(g => `
-    <label style=”display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px”>
-      <input type=”checkbox” class=”nu-group-cb” value=”${esc(g)}” style=”width:16px;height:16px;accent-color:var(--primary)”>
+    <label style=�display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px�>
+      <input type=�checkbox� class=�nu-group-cb� value=�${esc(g)}� style=�width:16px;height:16px;accent-color:var(--primary)�>
       ${esc(g)}
     </label>`).join('');
 
@@ -2608,14 +2608,14 @@ async function createNewUserFromModal() {
   try {
     const { email } = await dbCreateManagedUser(name, role, pass, scope);
     closeModal('modal-new-user');
-    showToast(`Utente “${name}” creato. Email: ${email}`, 'success');
+    showToast(`Utente �${name}� creato. Email: ${email}`, 'success');
     await renderAdmin();
-  } catch(e) { showToast(friendlyError(e, “Impossibile creare l'utente.”), 'error'); }
+  } catch(e) { showToast(friendlyError(e, �Impossibile creare l'utente.�), 'error'); }
   finally { showLoading(false); }
 }
 
-// â€” RENDER â€” ADMIN
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// — RENDER — ADMIN
+// ==================================================
 async function renderAdmin() {
   showLoading(true);
   try {
@@ -2627,7 +2627,7 @@ async function renderAdmin() {
     const withOut = avail.filter(a => a.out > 0);
     const availEl = document.getElementById('admin-avail');
     if (!withOut.length) {
-      availEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-3);font-size:13px">Tutto il materiale Ã¨ disponibile.</div>';
+      availEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-3);font-size:13px">Tutto il materiale è disponibile.</div>';
     } else {
       availEl.innerHTML = `
         <div class="avail-row header">
@@ -2725,9 +2725,9 @@ async function renderAdmin() {
   } finally { showLoading(false); }
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ==================================================
 // EXCEL EXPORT  (SheetJS)
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ==================================================
 async function exportXlsx() {
   const cl = S.currentCl;
   if (!cl) return;
@@ -2772,9 +2772,9 @@ async function exportXlsx() {
   } finally { showLoading(false); }
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// PROFILE MODAL â€” one-time setup for operators
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ==================================================
+// PROFILE MODAL — one-time setup for operators
+// ==================================================
 function showProfileModal(onSaved) {
   openModal('modal-profile', '#prof-fullname');
   if (S.operatorProfile) {
@@ -2800,9 +2800,9 @@ function showProfileModal(onSaved) {
   };
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ==================================================
 // PROFILE PAGE
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ==================================================
 function renderProfile() {
   const p = S.operatorProfile || {};
   document.getElementById('profile-email-label').textContent = S.session?.user?.email || '';
@@ -2811,9 +2811,9 @@ function renderProfile() {
   document.getElementById('pp-phone').value        = p.phone        || '';
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ==================================================
 // EVENT WIRING
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ==================================================
 function wireEvents() {
   document.addEventListener('keydown', handleModalKeydown);
 
@@ -2878,7 +2878,7 @@ function wireEvents() {
     const btn = document.getElementById('btn-check-update');
     const defaultHtml = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = '<span>Aggiornamento in corsoâ€¦</span>';
+    btn.innerHTML = '<span>Aggiornamento in corso…</span>';
     try {
       // Nuclear update: de-registra SW + pulisce cache + ricarica
       if ('serviceWorker' in navigator) {
@@ -3062,9 +3062,9 @@ function wireEvents() {
   });
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ==================================================
 // AUTH
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ==================================================
 async function handleLogin() {
   const raw   = document.getElementById('inp-email').value.trim();
   const email = raw.includes('@') ? raw : raw + '@cepc.app';
@@ -3074,7 +3074,7 @@ async function handleLogin() {
   const btn = document.getElementById('btn-login');
   const defaultHtml = btn.innerHTML;
   btn.disabled = true;
-  btn.innerHTML = '<span>Accesso in corsoâ€¦</span>';
+  btn.innerHTML = '<span>Accesso in corso…</span>';
 
   try {
     const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
@@ -3136,9 +3136,9 @@ async function onLoginSuccess() {
   navigate('home');
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ==================================================
 // INIT
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ==================================================
 async function init() {
   wireEvents();
 
@@ -3163,10 +3163,10 @@ async function init() {
   });
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// VERSION CHECK â€” bypassa Brave e qualsiasi cache aggressiva
+// ==================================================
+// VERSION CHECK — bypassa Brave e qualsiasi cache aggressiva
 // Incrementa APP_VERSION ad ogni deploy insieme a version.json e SW_VER
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ==================================================
 const APP_VERSION = 3;
 
 async function checkVersion() {
@@ -3185,11 +3185,11 @@ async function checkVersion() {
         const keys = await caches.keys();
         await Promise.all(keys.map(k => caches.delete(k)));
       }
-      // Ricarica con URL cache-bust â†’ il browser non puÃ² servire nulla dalla sua cache HTTP
+      // Ricarica con URL cache-bust → il browser non può servire nulla dalla sua cache HTTP
       window.location.replace(location.pathname + '?_r=' + Date.now());
       await new Promise(() => {}); // blocca l'esecuzione mentre il redirect avviene
     }
-  } catch (_) { /* offline â€” salta il check */ }
+  } catch (_) { /* offline — salta il check */ }
 }
 
 checkVersion().then(() => init()).catch(console.error);
@@ -3206,7 +3206,7 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register(`sw.js?v=${SW_VER}`).then(reg => {
       window._swReg = reg;
 
-      // Messaggio dal SW dopo clients.claim() â†’ nuova versione attiva
+      // Messaggio dal SW dopo clients.claim() → nuova versione attiva
       navigator.serviceWorker.addEventListener('message', e => {
         if (e.data?.type === 'SW_UPDATED') showUpdateBanner();
       });
