@@ -805,8 +805,8 @@
     </div>
     <div id="login-error" class="login-error"></div>
     <div class="form-group">
-      <label class="form-label" for="inp-email">Email</label>
-      <input id="inp-email" type="email" class="form-control" placeholder="operatore@cepc.local" autocomplete="email">
+      <label class="form-label" for="inp-email">Username</label>
+      <input id="inp-email" type="text" class="form-control" placeholder="mario.rossi" autocomplete="username" inputmode="email">
     </div>
     <div class="form-group">
       <label class="form-label" for="inp-pass">Password</label>
@@ -970,6 +970,13 @@
         <div class="section-label">Check funzionamento richiesto</div>
         <div class="t-small t-muted" style="margin-bottom:8px">Attiva il flag per gli articoli che richiedono una verifica di funzionamento alla consegna.</div>
         <div id="admin-items-config"></div>
+      </div>
+      <!-- Gestione Utenti -->
+      <div class="section">
+        <div class="section-label">Gestione Utenti</div>
+        <div class="t-small t-muted" style="margin-bottom:12px">Crea e gestisci gli accessi al sistema. Le password sono visibili solo qui.</div>
+        <button class="btn btn-primary" id="btn-new-user" style="margin-bottom:12px">+ Nuovo Utente</button>
+        <div id="admin-users-list"></div>
       </div>
     </div>
   </div>
@@ -1284,6 +1291,13 @@ const ENCRYPT_PASS  = 'VicenzaCEPCInventarioFormia2026';
 // â”€â”€ Supabase client â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
+// ── Admin client (service role — bypassa RLS per creare/cancellare utenti) ──
+// Ottieni da: Supabase Dashboard → Settings → API → service_role key
+const SUPABASE_SERVICE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51bXB3emhmbXVzYWFnamlxa29jIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3ODI1NTU3MiwiZXhwIjoyMDkzODMxNTcyfQ.jhnqrzeM3P7EkyI8qGtc1eWTTDAKXuSVmz0xiv_nEkg";
+const sb_admin = supabase.createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
+  auth: { autoRefreshToken: false, persistSession: false }
+});
+
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // ENCRYPTION  (AES-256-GCM via Web Crypto API)
 // Protegge i dati personali dell'operatore nei dump DB.
@@ -1461,8 +1475,10 @@ function friendlyError(err, fallback = 'Si e verificato un problema. Riprova.') 
 // DB HELPERS
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 async function dbGetRole(userId) {
-  const { data } = await sb.from('user_roles').select('role').eq('user_id', userId).single();
-  return data?.role ?? 'operator';
+  const { data } = await sb.from('user_roles')
+    .select('role,scope_groups,scope_checklist,scope_valid_until')
+    .eq('user_id', userId).single();
+  return data ?? { role: 'operator', scope_groups: null, scope_checklist: true, scope_valid_until: null };
 }
 
 
@@ -2388,9 +2404,10 @@ async function renderInventory() {
 function buildInvList(filter) {
   const isAdmin = S.role === 'admin';
   const f = filter.toLowerCase().trim();
-  const items = S.inventoryItems.filter(i =>
-    !f || i.description.toLowerCase().includes(f) || i.notes.toLowerCase().includes(f)
-  );
+  const items = S.inventoryItems.filter(i => {
+    if (S.inventoryGroupFilter?.length && !S.inventoryGroupFilter.includes(i.group)) return false;
+    return !f || i.description.toLowerCase().includes(f) || i.notes.toLowerCase().includes(f);
+  });
   const groups = groupBySection(items);
   const el = document.getElementById('inv-list');
 
@@ -2437,7 +2454,167 @@ function buildInvList(filter) {
 }
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// RENDER â€” ADMIN
+// USER MANAGEMENT
+// ══════════════════════════════════════════════════════════════════
+const _WORDLIST = ['mare','monte','vento','fiume','terra','cielo','rocca','forza','luce','lago','torre','porta','bosco','campo','pietra'];
+const _SYMBOLS  = '!@#$%&*';
+
+function generatePassword() {
+  const w = _WORDLIST[Math.floor(Math.random() * _WORDLIST.length)];
+  const n = String(Math.floor(Math.random() * 900) + 100);
+  const s = _SYMBOLS[Math.floor(Math.random() * _SYMBOLS.length)];
+  return w + n + s;
+}
+
+async function dbListManagedUsers() {
+  const { data, error } = await sb.from('user_roles')
+    .select('user_id,role,display_name,plain_password,scope_groups,scope_checklist,scope_valid_until')
+    .order('display_name');
+  if (error) throw error;
+  return data || [];
+}
+
+async function dbCreateManagedUser(displayName, role, password, scope) {
+  const email = displayName.toLowerCase().replace(/\s+/g, '.') + '@cepc.app';
+  const { data, error } = await sb_admin.auth.admin.createUser({
+    email, password, email_confirm: true
+  });
+  if (error) throw error;
+  const userId = data.user.id;
+  const row = {
+    user_id:           userId,
+    role,
+    display_name:      displayName,
+    plain_password:    password,
+    scope_groups:      scope.groups?.length ? scope.groups : null,
+    scope_checklist:   scope.checklist,
+    scope_valid_until: scope.valid_until || null
+  };
+  const { error: e2 } = await sb.from('user_roles').insert(row);
+  if (e2) {
+    await sb_admin.auth.admin.deleteUser(userId).catch(() => {});
+    throw e2;
+  }
+  return { userId, email };
+}
+
+async function dbDeleteManagedUser(userId) {
+  await sb.from('user_roles').delete().eq('user_id', userId);
+  const { error } = await sb_admin.auth.admin.deleteUser(userId);
+  if (error) throw error;
+}
+
+function renderUserManagement(users) {
+  const el = document.getElementById('admin-users-list');
+  if (!users.length) {
+    el.innerHTML = '<div class=”card t-muted t-small” style=”text-align:center;padding:20px”>Nessun utente creato.</div>';
+    return;
+  }
+  const roleBadge = r => r === 'admin'
+    ? '<span class=”badge” style=”background:#FEF2F2;color:#991B1B;border:1px solid #FECACA”>Admin</span>'
+    : '<span class=”badge badge-neutral”>Operatore</span>';
+
+  const scopeInfo = u => {
+    const parts = [];
+    if (u.scope_groups?.length)       parts.push('Gruppi: ' + u.scope_groups.join(', '));
+    if (u.scope_checklist === false)   parts.push('No checklist');
+    if (u.scope_valid_until)          parts.push('Scade: ' + u.scope_valid_until);
+    return parts.length ? parts.join(' · ') : 'Accesso completo';
+  };
+
+  el.innerHTML = '<div style=”background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden”>' +
+    users.map(u => `
+    <div class=”list-row” style=”flex-direction:column;align-items:stretch;gap:6px”>
+      <div style=”display:flex;align-items:center;gap:8px”>
+        ${roleBadge(u.role)}
+        <span class=”t-h3” style=”flex:1”>${esc(u.display_name || '—')}</span>
+        <button class=”icon-btn icon-btn-danger” title=”Elimina utente” data-uid=”${esc(u.user_id)}”>
+          <svg xmlns=”http://www.w3.org/2000/svg” viewBox=”0 0 24 24” fill=”none” stroke=”currentColor” stroke-width=”2” stroke-linecap=”round” stroke-linejoin=”round”>
+            <path d=”M3 6h18”/><path d=”M8 6V4h8v2”/><path d=”M19 6l-1 14H6L5 6”/>
+          </svg>
+        </button>
+      </div>
+      <div style=”display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px”>
+        <span class=”t-muted”>Email:</span>
+        <code style=”background:#F1F5F9;padding:1px 6px;border-radius:4px”>${esc((u.display_name||'').toLowerCase().replace(/\s+/g,'.')+'@cepc.app')}</code>
+        <span class=”t-muted” style=”margin-left:6px”>Password:</span>
+        <code style=”background:#F0FDF4;border:1px solid #BBF7D0;padding:1px 8px;border-radius:4px;font-size:13px;font-weight:700;letter-spacing:0.5px;color:#166534”>${esc(u.plain_password || '—')}</code>
+      </div>
+      ${u.role === 'operator' ? `<div class=”t-meta”>${esc(scopeInfo(u))}</div>` : ''}
+    </div>`).join('') + '</div>';
+
+  el.querySelectorAll('[data-uid]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Eliminare questo utente? Azione irreversibile.')) return;
+      showLoading(true);
+      try {
+        await dbDeleteManagedUser(btn.dataset.uid);
+        showToast('Utente eliminato.', 'success');
+        await renderAdmin();
+      } catch(e) { showToast(friendlyError(e, “Impossibile eliminare l'utente.”), 'error'); }
+      finally { showLoading(false); }
+    });
+  });
+}
+
+let _nuChecklistScope = true;
+
+function openNewUserModal() {
+  document.getElementById('nu-username').value    = '';
+  document.getElementById('nu-role').value        = 'operator';
+  document.getElementById('nu-valid-until').value = '';
+  document.getElementById('nu-admin-warning').classList.add('hidden');
+  document.getElementById('nu-admin-confirm').value = '';
+  document.getElementById('nu-scope-section').classList.remove('hidden');
+
+  _nuChecklistScope = true;
+  document.getElementById('nu-checklist-toggle').classList.add('on');
+
+  document.getElementById('nu-password').value = generatePassword();
+
+  const groups = [...new Set(S.inventoryItems.map(i => i.group).filter(Boolean))].sort();
+  document.getElementById('nu-groups-list').innerHTML = groups.map(g => `
+    <label style=”display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px”>
+      <input type=”checkbox” class=”nu-group-cb” value=”${esc(g)}” style=”width:16px;height:16px;accent-color:var(--primary)”>
+      ${esc(g)}
+    </label>`).join('');
+
+  openModal('modal-new-user', '#nu-username');
+}
+
+async function createNewUserFromModal() {
+  const name = document.getElementById('nu-username').value.trim();
+  const role = document.getElementById('nu-role').value;
+  const pass = document.getElementById('nu-password').value.trim();
+
+  if (!name) { showToast('Inserisci uno username.', 'error'); return; }
+  if (!pass) { showToast('Password mancante.', 'error'); return; }
+
+  if (role === 'admin') {
+    if (document.getElementById('nu-admin-confirm').value.trim() !== 'ADMIN') {
+      showToast('Digita ADMIN nel campo di conferma per creare un admin.', 'error');
+      return;
+    }
+  }
+
+  const checkedGroups = [...document.querySelectorAll('.nu-group-cb:checked')].map(c => c.value);
+  const scope = {
+    groups:      role === 'operator' ? checkedGroups : [],
+    checklist:   role === 'operator' ? _nuChecklistScope : true,
+    valid_until: role === 'operator' ? (document.getElementById('nu-valid-until').value || null) : null
+  };
+
+  showLoading(true);
+  try {
+    const { email } = await dbCreateManagedUser(name, role, pass, scope);
+    closeModal('modal-new-user');
+    showToast(`Utente “${name}” creato. Email: ${email}`, 'success');
+    await renderAdmin();
+  } catch(e) { showToast(friendlyError(e, “Impossibile creare l'utente.”), 'error'); }
+  finally { showLoading(false); }
+}
+
+// â€” RENDER â€” ADMIN
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 async function renderAdmin() {
   showLoading(true);
@@ -2541,6 +2718,10 @@ async function renderAdmin() {
       });
     });
 
+    // Gestione utenti
+    const users = await dbListManagedUsers();
+    renderUserManagement(users);
+
   } finally { showLoading(false); }
 }
 
@@ -2643,6 +2824,23 @@ function wireEvents() {
   document.getElementById('btn-login').addEventListener('click', handleLogin);
   document.getElementById('inp-pass').addEventListener('keydown', e => {
     if (e.key === 'Enter') handleLogin();
+  });
+
+  // New user modal
+  document.getElementById('btn-new-user').addEventListener('click', openNewUserModal);
+  document.getElementById('btn-nu-cancel').addEventListener('click', () => closeModal('modal-new-user'));
+  document.getElementById('btn-nu-create').addEventListener('click', createNewUserFromModal);
+  document.getElementById('nu-regen-pass').addEventListener('click', () => {
+    document.getElementById('nu-password').value = generatePassword();
+  });
+  document.getElementById('nu-role').addEventListener('change', e => {
+    const isAdmin = e.target.value === 'admin';
+    document.getElementById('nu-admin-warning').classList.toggle('hidden', !isAdmin);
+    document.getElementById('nu-scope-section').classList.toggle('hidden', isAdmin);
+  });
+  document.getElementById('nu-checklist-toggle').addEventListener('click', function() {
+    _nuChecklistScope = !_nuChecklistScope;
+    this.classList.toggle('on', _nuChecklistScope);
   });
 
   document.getElementById('btn-cl-reset').addEventListener('click', openResetModal);
@@ -2868,7 +3066,8 @@ function wireEvents() {
 // AUTH
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 async function handleLogin() {
-  const email = document.getElementById('inp-email').value.trim();
+  const raw   = document.getElementById('inp-email').value.trim();
+  const email = raw.includes('@') ? raw : raw + '@cepc.app';
   const pass  = document.getElementById('inp-pass').value;
   const errEl = document.getElementById('login-error');
   errEl.classList.remove('visible');
@@ -2881,7 +3080,9 @@ async function handleLogin() {
     const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
     if (error) throw error;
     S.session = data.session;
-    S.role    = await dbGetRole(data.user.id);
+    const roleData = await dbGetRole(data.user.id);
+    S.role  = roleData.role;
+    S.scope = roleData;
     await initEncKey();
     await onLoginSuccess();
   } catch(e) {
@@ -2899,6 +3100,23 @@ async function onLoginSuccess() {
 
   if (S.role === 'admin') {
     document.getElementById('nav-admin-tab').classList.remove('hidden');
+  }
+
+  // Applica scope operatore
+  if (S.role === 'operator' && S.scope) {
+    if (S.scope.scope_valid_until && new Date(S.scope.scope_valid_until) < new Date()) {
+      await sb.auth.signOut();
+      const errEl = document.getElementById('login-error');
+      errEl.textContent = 'Account scaduto. Contatta un amministratore.';
+      errEl.classList.add('visible');
+      document.getElementById('page-login').classList.remove('hidden');
+      document.getElementById('app-shell').classList.add('hidden');
+      return;
+    }
+    if (S.scope.scope_checklist === false) {
+      document.querySelector('[data-tab="checklists"]').classList.add('hidden');
+    }
+    S.inventoryGroupFilter = S.scope.scope_groups?.length ? S.scope.scope_groups : null;
   }
 
   S.inventoryItems = await dbGetInventory();
@@ -2927,7 +3145,9 @@ async function init() {
   const { data: { session } } = await sb.auth.getSession();
   if (session) {
     S.session = session;
-    S.role    = await dbGetRole(session.user.id);
+    const roleData = await dbGetRole(session.user.id);
+    S.role  = roleData.role;
+    S.scope = roleData;
     await initEncKey();
     await onLoginSuccess();
   }
@@ -3001,6 +3221,71 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+
+<!-- New User Modal (admin) -->
+<div id="modal-new-user" class="modal-backdrop hidden">
+  <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="modal-new-user-title" style="max-height:90vh;overflow-y:auto">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-new-user-title">Nuovo Utente</div>
+
+    <div class="form-group">
+      <label class="form-label" for="nu-username">Username</label>
+      <input id="nu-username" class="form-control" type="text" placeholder="mario.rossi" autocomplete="off" spellcheck="false">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="nu-role">Ruolo</label>
+      <select id="nu-role" class="form-control">
+        <option value="operator">Operatore</option>
+        <option value="admin">Admin</option>
+      </select>
+    </div>
+
+    <!-- Admin safeguard -->
+    <div id="nu-admin-warning" class="hidden" style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:12px;margin-bottom:12px;font-size:13px;color:#991B1B">
+      <strong>Attenzione:</strong> stai creando un account Admin con accesso completo. Digita <strong>ADMIN</strong> per confermare.
+      <input id="nu-admin-confirm" class="form-control" type="text" placeholder="ADMIN" style="margin-top:8px;font-weight:700;letter-spacing:2px">
+    </div>
+
+    <!-- Scope (solo operator) -->
+    <div id="nu-scope-section">
+      <div class="section-label" style="margin-bottom:8px">Scope Operatore</div>
+
+      <div class="form-group">
+        <label class="form-label">Gruppi inventario accessibili</label>
+        <div class="t-small t-muted" style="margin-bottom:6px">Vuoto = tutti i gruppi</div>
+        <div id="nu-groups-list" style="display:flex;flex-direction:column;gap:6px"></div>
+      </div>
+
+      <div class="form-group">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+          <div class="toggle-track" id="nu-checklist-toggle">
+            <div class="toggle-thumb"></div>
+          </div>
+          <span class="form-label" style="margin:0">Accesso Checklist</span>
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="nu-valid-until">Valido fino a (vuoto = illimitato)</label>
+        <input id="nu-valid-until" class="form-control" type="date">
+      </div>
+    </div>
+
+    <div class="form-group" style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:12px">
+      <label class="form-label" style="color:#166534">Password generata</label>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input id="nu-password" class="form-control" type="text" readonly style="font-family:monospace;font-size:15px;font-weight:700;letter-spacing:1px;background:#fff">
+        <button class="btn btn-ghost btn-sm" id="nu-regen-pass" type="button" title="Rigenera">&#x21BB;</button>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button id="btn-nu-cancel" class="btn btn-ghost" style="flex:1">Annulla</button>
+      <button id="btn-nu-create" class="btn btn-primary" style="flex:1">Crea Utente</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
 
