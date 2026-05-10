@@ -1291,7 +1291,7 @@ const ENCRYPT_PASS  = 'VicenzaCEPCInventarioFormia2026';
 // ── Supabase client ─────────────────────────────────────────
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-// == Admin client (service role � bypassa RLS per creare/cancellare utenti) ==
+// == Admin client (service role " bypassa RLS per creare/cancellare utenti) ==
 // Ottieni da: Supabase Dashboard ? Settings ? API ? service_role key
 const SUPABASE_SERVICE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51bXB3emhmbXVzYWFnamlxa29jIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3ODI1NTU3MiwiZXhwIjoyMDkzODMxNTcyfQ.jhnqrzeM3P7EkyI8qGtc1eWTTDAKXuSVmz0xiv_nEkg";
 const sb_admin = supabase.createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
@@ -2507,40 +2507,40 @@ async function dbDeleteManagedUser(userId) {
 function renderUserManagement(users) {
   const el = document.getElementById('admin-users-list');
   if (!users.length) {
-    el.innerHTML = '<div class=�card t-muted t-small� style=�text-align:center;padding:20px�>Nessun utente creato.</div>';
+    el.innerHTML = '<div class="card t-muted t-small" style="text-align:center;padding:20px">Nessun utente creato.</div>';
     return;
   }
   const roleBadge = r => r === 'admin'
-    ? '<span class=�badge� style=�background:#FEF2F2;color:#991B1B;border:1px solid #FECACA�>Admin</span>'
-    : '<span class=�badge badge-neutral�>Operatore</span>';
+    ? '<span class="badge" style="background:#FEF2F2;color:#991B1B;border:1px solid #FECACA">Admin</span>'
+    : '<span class="badge badge-neutral">Operatore</span>';
 
   const scopeInfo = u => {
     const parts = [];
     if (u.scope_groups?.length)       parts.push('Gruppi: ' + u.scope_groups.join(', '));
     if (u.scope_checklist === false)   parts.push('No checklist');
     if (u.scope_valid_until)          parts.push('Scade: ' + u.scope_valid_until);
-    return parts.length ? parts.join(' � ') : 'Accesso completo';
+    return parts.length ? parts.join(' · ') : 'Accesso completo';
   };
 
-  el.innerHTML = '<div style=�background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden�>' +
+  el.innerHTML = '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">' +
     users.map(u => `
-    <div class=�list-row� style=�flex-direction:column;align-items:stretch;gap:6px�>
-      <div style=�display:flex;align-items:center;gap:8px�>
+    <div class="list-row" style="flex-direction:column;align-items:stretch;gap:6px">
+      <div style="display:flex;align-items:center;gap:8px">
         ${roleBadge(u.role)}
-        <span class=�t-h3� style=�flex:1�>${esc(u.display_name || '�')}</span>
-        <button class=�icon-btn icon-btn-danger� title=�Elimina utente� data-uid=�${esc(u.user_id)}�>
-          <svg xmlns=�http://www.w3.org/2000/svg� viewBox=�0 0 24 24� fill=�none� stroke=�currentColor� stroke-width=�2� stroke-linecap=�round� stroke-linejoin=�round�>
-            <path d=�M3 6h18�/><path d=�M8 6V4h8v2�/><path d=�M19 6l-1 14H6L5 6�/>
+        <span class="t-h3" style="flex:1">${esc(u.display_name || '—')}</span>
+        <button class="icon-btn icon-btn-danger" title="Elimina utente" data-uid="${esc(u.user_id)}">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/>
           </svg>
         </button>
       </div>
-      <div style=�display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px�>
-        <span class=�t-muted�>Email:</span>
-        <code style=�background:#F1F5F9;padding:1px 6px;border-radius:4px�>${esc((u.display_name||'').toLowerCase().replace(/\s+/g,'.')+'@cepc.app')}</code>
-        <span class=�t-muted� style=�margin-left:6px�>Password:</span>
-        <code style=�background:#F0FDF4;border:1px solid #BBF7D0;padding:1px 8px;border-radius:4px;font-size:13px;font-weight:700;letter-spacing:0.5px;color:#166534�>${esc(u.plain_password || '�')}</code>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px">
+        <span class="t-muted">Email:</span>
+        <code style="background:#F1F5F9;padding:1px 6px;border-radius:4px">${esc((u.display_name||'').toLowerCase().replace(/\s+/g,'.')+'@cepc.app')}</code>
+        <span class="t-muted" style="margin-left:6px">Password:</span>
+        <code style="background:#F0FDF4;border:1px solid #BBF7D0;padding:1px 8px;border-radius:4px;font-size:13px;font-weight:700;letter-spacing:0.5px;color:#166534">${esc(u.plain_password || '—')}</code>
       </div>
-      ${u.role === 'operator' ? `<div class=�t-meta�>${esc(scopeInfo(u))}</div>` : ''}
+      ${u.role === 'operator' ? `<div class="t-meta">${esc(scopeInfo(u))}</div>` : ''}
     </div>`).join('') + '</div>';
 
   el.querySelectorAll('[data-uid]').forEach(btn => {
@@ -2551,7 +2551,7 @@ function renderUserManagement(users) {
         await dbDeleteManagedUser(btn.dataset.uid);
         showToast('Utente eliminato.', 'success');
         await renderAdmin();
-      } catch(e) { showToast(friendlyError(e, �Impossibile eliminare l'utente.�), 'error'); }
+      } catch(e) { showToast(friendlyError(e, `Impossibile eliminare l'utente.`), 'error'); }
       finally { showLoading(false); }
     });
   });
@@ -2574,8 +2574,8 @@ function openNewUserModal() {
 
   const groups = [...new Set(S.inventoryItems.map(i => i.group).filter(Boolean))].sort();
   document.getElementById('nu-groups-list').innerHTML = groups.map(g => `
-    <label style=�display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px�>
-      <input type=�checkbox� class=�nu-group-cb� value=�${esc(g)}� style=�width:16px;height:16px;accent-color:var(--primary)�>
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px">
+      <input type="checkbox" class="nu-group-cb" value="${esc(g)}" style="width:16px;height:16px;accent-color:var(--primary)">
       ${esc(g)}
     </label>`).join('');
 
@@ -2608,9 +2608,9 @@ async function createNewUserFromModal() {
   try {
     const { email } = await dbCreateManagedUser(name, role, pass, scope);
     closeModal('modal-new-user');
-    showToast(`Utente �${name}� creato. Email: ${email}`, 'success');
+    showToast(`Utente "${name}" creato. Email: ${email}`, 'success');
     await renderAdmin();
-  } catch(e) { showToast(friendlyError(e, �Impossibile creare l'utente.�), 'error'); }
+  } catch(e) { showToast(friendlyError(e, `Impossibile creare l'utente.`), 'error'); }
   finally { showLoading(false); }
 }
 
